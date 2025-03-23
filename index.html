@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Risk Simulation Game for Software Engineering</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Include Chart.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include SheetJS from CDN for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+</head>
+<body>
+    <!-- Help Button -->
+    <button id="helpButton">Help</button>
+
+    <!-- Logo Image -->
+    <img src="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg" alt="VAMK Logo" style="max-width: 200px; margin: 0 auto 20px auto; display: block;">
+
+    <h1>Risk Simulation Game for Software Engineering</h1>
+    <p>In this interactive simulation, you take on the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks. Your strategic decisions will determine the project's outcome. Created by Thomas Vikström (v.0.1 - 10.2.2025 19:00)</p>
+
+    <!-- Project Setup -->
+    <div id="setup">
+        <h2>Project Setup</h2>
+        <label for="projectName">Project Name:</label>
+        <input type="text" id="projectName"><br>
+
+        <!-- The budget here is in thousands (€k). The code later converts the input value to euros. -->
+        <label for="projectBudget">Project Budget (in €k):</label>
+        <input type="number" id="projectBudget" value="100" onchange="updateBaselineCost()"><br>
+
+        <label for="projectDuration">Project Duration (months):</label>
+        <input type="number" id="projectDuration" value="24" onchange="updateBaselineCost()"><br>
+
+        <!-- Baseline Cost per Turn auto-calculated and displayed in €k -->
+        <label for="baselineCost">Baseline Cost per Turn (in €k):</label>
+        <input type="number" id="baselineCost" readonly><br>
+
+        <label for="riskContingencyPercentage">Risk Contingency Budget (% of Total Budget):</label>
+        <input type="number" id="riskContingencyPercentage" value="10"><br>
+
+        <button class="button-action" onclick="startGame()">Start Game</button>
+    </div>
+
+    <!-- Game and Simulation Sections -->
+    <div id="game" class="hidden">
+        <h2>Add a Risk (Add at least 5 risks!)</h2>
+        <label for="riskName">Risk Name:</label>
+        <input type="text" id="riskName" placeholder="e.g., Requirement Creep"><br>
+
+        <label for="riskType">Risk Type:</label>
+        <select id="riskType">
+            <option value="Technical">Technical</option>
+            <option value="Operational">Operational</option>
+            <option value="Security">Security</option>
+            <option value="Scope">Scope</option>
+            <option value="Management">Management</option>
+        </select><br>
+
+        <label for="likelihood">Likelihood (1-5):</label>
+        <input type="number" id="likelihood" min="1" max="5" value="3"><br>
+
+        <label for="impact">Impact (1-5):</label>
+        <input type="number" id="impact" min="1" max="5" value="3"><br>
+
+        <label for="minCost">Minimum Cost if Occurs (€):</label>
+        <input type="number" id="minCost" value="5000"><br>
+
+        <label for="costPercentage">Cost as % of Budget:</label>
+        <input type="number" id="costPercentage" value="5"><br>
+
+        <!-- New Field: Risk Response Description -->
+        <label for="riskResponseDescription">Risk Response Description:</label>
+        <input type="text" id="riskResponseDescription" placeholder="e.g., Implement agile practices to control scope"><br>
+
+        <button class="button-action" onclick="addRisk()">Add Risk</button>
+
+        <h2>Risk Register</h2>
+        <!-- Button Container for Alignment -->
+        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+            <button class="button-action" onclick="proceedToSimulation()">Proceed to Simulation</button>
+            <button class="button-action" onclick="exportRiskRegister()">Export to Excel</button>
+        </div>
+        <table id="riskTable">
+            <tr>
+                <th>Risk Name</th>
+                <th>Type</th>
+                <th>Likelihood</th>
+                <th>Impact</th>
+                <th>Min Cost (€)</th>
+                <th>Cost (% of Budget)</th>
+                <th>Risk Score</th>
+                <th>Risk Level</th>
+                <th>Risk Response Description</th>
+            </tr>
+        </table>
+    </div>
+
+    <div id="simulation" class="hidden">
+        <h2>Simulation</h2>
+        <p id="simulationInfo"></p>
+
+        <div id="riskEvent" class="hidden">
+            <h3>Risk Event Occurred!</h3>
+            <div id="riskEventDescription"></div>
+            <label for="riskResponse">Choose Your Response:</label>
+            <select id="riskResponse">
+                <option value="">--Select an Action--</option>
+                <option value="Mitigate">Mitigate</option>
+                <option value="Avoid">Avoid</option>
+                <option value="Transfer">Transfer</option>
+                <option value="Accept">Accept</option>
+            </select><br>
+            <div id="responseExplanation"></div>
+            <button class="button-action" onclick="respondToRisk()">Respond</button>
+        </div>
+
+        <button id="nextTurnButton" class="button-action" onclick="nextTurn()">Next Turn</button>
+
+        <h2>Project Status</h2>
+        <div class="progress-bar">
+            <span class="progress-label">Budget Remaining:</span>
+            <div class="progress-container">
+                <div id="budgetProgress" class="progress"></div>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <span class="progress-label">Project Quality:</span>
+            <div class="progress-container">
+                <div id="qualityProgress" class="progress"></div>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <span class="progress-label">Risk Contingency Remaining:</span>
+            <div class="progress-container">
+                <div id="riskContingencyProgress" class="progress"></div>
+            </div>
+        </div>
+        <p id="projectStatus"></p>
+
+        <div id="charts">
+            <canvas id="budgetChart" width="400" height="200"></canvas>
+            <canvas id="qualityChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <div id="gameStatus"></div>
+
+    <!-- Final Project Result Section -->
+    <div id="finalResult" class="hidden">
+        <h2>Simulation Results</h2>
+        <div id="finalProjectInfo"></div>
+        <h3>Your Overall Score</h3>
+        <p id="finalScore"></p>
+        <button class="button-action" onclick="window.print()">Print Results</button>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Risk Simulation Game Instructions - Software Engineering</h2>
+            <p>Welcome to the <strong>Risk Simulation Game for Software Engineering</strong>! In this interactive simulation, you assume the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks.</p>
+
+            <h3>How It Works</h3>
+            <ol>
+                <li><strong>Project Setup</strong>:
+                    <ul>
+                        <li><strong>Project Name</strong>: Enter a unique name for your software project.</li>
+                        <li><strong>Project Budget</strong>: Specify the total budget for your project in €k.</li>
+                        <li><strong>Project Duration</strong>: Set the project duration in months.</li>
+                        <li><strong>Risk Contingency Budget</strong>: Allocate a percentage of your total budget to handle unforeseen risks.</li>
+                    </ul>
+                </li>
+                <li><strong>Adding Risks</strong>:
+                    <ul>
+                        <li><strong>Risk Details</strong>: Add at least five risks by providing:
+                            <ul>
+                                <li><strong>Risk Name</strong>: A descriptive name (e.g., "Requirement Creep").</li>
+                                <li><strong>Risk Type</strong>: Categorize the risk (e.g., Technical, Operational, Security, Scope, Management).</li>
+                                <li><strong>Likelihood</strong>: Rate the probability of occurrence (1-5).</li>
+                                <li><strong>Impact</strong>: Assess the potential impact (1-5).</li>
+                                <li><strong>Minimum Cost if Occurs (€)</strong>: Estimate the minimum cost if the risk materializes.</li>
+                                <li><strong>Cost as % of Budget</strong>: Specify the cost impact as a percentage of the total budget.</li>
+                                <li><strong>Risk Response Description</strong>: Describe your strategy to address the risk.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Simulation Turns</strong>:
+                    <ul>
+                        <li>The simulation advances in turns (each turn representing one month of the project).</li>
+                        <li><strong>Baseline Costs</strong>: Each turn, a portion of your budget is deducted as the baseline cost.</li>
+                        <li><strong>Risk Events</strong>: Random risk events may occur. When a risk occurs, choose a response:
+                            <ul>
+                                <li><strong>Mitigate</strong>: Reduce the risk's likelihood or impact.</li>
+                                <li><strong>Avoid</strong>: Alter project plans to eliminate the risk.</li>
+                                <li><strong>Transfer</strong>: Shift the risk to a third party (e.g., through outsourcing or insurance).</li>
+                                <li><strong>Accept</strong>: Proceed without additional measures.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Project Status Tracking</strong>:
+                    <ul>
+                        <li><strong>Budget Remaining</strong>: Monitors your available funds.</li>
+                        <li><strong>Project Quality</strong>: Reflects the overall quality of your software product.</li>
+                        <li><strong>Risk Contingency Remaining</strong>: Shows the funds reserved for handling risks.</li>
+                    </ul>
+                </li>
+                <li><strong>Scoring System</strong>:
+                    <ul>
+                        <li>Your final score is based on:
+                            <ul>
+                                <li>Budget Remaining (40%)</li>
+                                <li>Project Quality (40%)</li>
+                                <li>Risk Contingency Remaining (20%)</li>
+                            </ul>
+                        </li>
+                        <li>A higher score indicates better risk management and overall project success.</li>
+                    </ul>
+                </li>
+                <li><strong>Exporting Risk Register</strong>:
+                    <ul>
+                        <li>You can export your Risk Register to an Excel file at any time for further analysis.</li>
+                    </ul>
+                </li>
+                <li><strong>Final Results</strong>:
+                    <ul>
+                        <li>At simulation end, you’ll receive a summary of your performance, including detailed metrics and an overall score.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h3>Tips for Success</h3>
+            <ul>
+                <li><strong>Diversify Your Risk Responses</strong>: Not every risk is managed the same way—choose the response that best fits the situation.</li>
+                <li><strong>Monitor Your Budget and Quality</strong>: Keep a close eye on your financial and quality metrics throughout the project.</li>
+                <li><strong>Plan for the Unexpected</strong>: Allocate sufficient funds in your risk contingency to handle unforeseen challenges.</li>
+            </ul>
+            <p>Good luck managing your software project and refining your risk management skills!</p>
+        </div>
+    </div>
+
+    <!-- JavaScript Code -->
+    
+</body>
+</html>

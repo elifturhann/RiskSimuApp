@@ -2,13 +2,11 @@ var project = {};
 var risks = [];
 var currentTurn = 0;
 var gameOver = false;
-
 var budgetData = [];
 var qualityData = [];
 var turnLabels = [];
-
-var budgetChart;
-var qualityChart;
+var currentRiskEvent = null;
+var performanceLog = [];
 
 window.onload = function() {
     setDefaultProjectName();
@@ -23,8 +21,7 @@ function setDefaultProjectName() {
     var currentDate = new Date();
     var dateString = formatDate(currentDate);
     var timeString = formatTime(currentDate);
-    var defaultProjectName = randomName + " " + dateString + " " + timeString;
-    document.getElementById('projectName').value = defaultProjectName;
+    document.getElementById('projectName').value = randomName + " " + dateString + " " + timeString;
 }
 
 function formatDate(date) {
@@ -42,21 +39,18 @@ function formatTime(date) {
 }
 
 function updateBaselineCost() {
-    // Convert project budget from €k to €
     var projectBudget = parseFloat(document.getElementById('projectBudget').value) * 1000;
     var projectDuration = parseInt(document.getElementById('projectDuration').value);
     if (isNaN(projectBudget) || isNaN(projectDuration) || projectDuration === 0) {
         document.getElementById('baselineCost').value = "";
         return;
     }
-    // Calculate baseline cost per turn then convert back to €k for display
     var baselineCostPerTurn = (projectBudget / projectDuration) - (0.01 * projectBudget);
-    baselineCostPerTurn = baselineCostPerTurn / 1000;
-    document.getElementById('baselineCost').value = baselineCostPerTurn.toFixed(2);
+    document.getElementById('baselineCost').value = (baselineCostPerTurn / 1000).toFixed(2);
 }
 
 function startGame() {
-    var projectNameInput = document.getElementById('projectName').value;
+    var projectNameInput = document.getElementById('projectName').value.trim().toLowerCase();
     var projectBudget = parseFloat(document.getElementById('projectBudget').value) * 1000;
     var projectDuration = parseInt(document.getElementById('projectDuration').value);
     var baselineCostPerTurn = parseFloat(document.getElementById('baselineCost').value) * 1000;
@@ -66,23 +60,20 @@ function startGame() {
         alert("Please enter a project name.");
         return;
     }
-
     if (isNaN(baselineCostPerTurn) || baselineCostPerTurn <= 0) {
-        alert("Invalid Baseline Cost per Turn. Please check your Project Budget and Duration.");
+        alert("Invalid Baseline Cost per Turn.");
         return;
     }
 
-    // Cheat function activation (if project name is "tv")
-    if (projectNameInput.trim().toLowerCase() === "tv") {
+    if (projectNameInput === "tv" || projectNameInput === "risk") {
         var currentDate = new Date();
         var dateString = formatDate(currentDate);
         var timeString = formatTime(currentDate);
-        projectNameInput += " " + dateString + " " + timeString;
+        projectNameInput = "Demo " + dateString + " " + timeString;
         generateCheatRisks();
     }
 
     var riskContingencyBudget = (riskContingencyPercentage / 100) * projectBudget;
-
     project = {
         name: projectNameInput,
         budget: projectBudget,
@@ -97,63 +88,24 @@ function startGame() {
 
     document.getElementById('setup').classList.add('hidden');
     document.getElementById('game').classList.remove('hidden');
+    document.getElementById('backButtonSetup').disabled = true;
     updateRiskTable();
 }
 
 function generateCheatRisks() {
+    risks = []; // Clear existing risks for cheat
     var cheatRisks = [
-        {
-            name: "Requirement Creep",
-            type: "Scope",
-            likelihood: 4,
-            impact: 3,
-            minCost: 5000,
-            costPercentage: 5,
-            responseDescription: "Implement agile practices and regular backlog reviews to control scope."
-        },
-        {
-            name: "Technical Debt Accumulation",
-            type: "Technical",
-            likelihood: 3,
-            impact: 4,
-            minCost: 4000,
-            costPercentage: 4,
-            responseDescription: "Plan refactoring cycles and enforce code reviews to reduce technical debt."
-        },
-        {
-            name: "Integration Issues",
-            type: "Technical",
-            likelihood: 3,
-            impact: 3,
-            minCost: 3000,
-            costPercentage: 3,
-            responseDescription: "Conduct early prototyping and thorough integration testing."
-        },
-        {
-            name: "Security Vulnerability",
-            type: "Security",
-            likelihood: 2,
-            impact: 5,
-            minCost: 6000,
-            costPercentage: 6,
-            responseDescription: "Perform regular security audits and implement robust security measures."
-        },
-        {
-            name: "Team Turnover",
-            type: "Operational",
-            likelihood: 4,
-            impact: 2,
-            minCost: 2000,
-            costPercentage: 2,
-            responseDescription: "Enhance team retention through competitive incentives and a positive culture."
-        }
+        { name: "Requirement Creep", type: "Scope", likelihood: 4, impact: 3, minCost: 5000, costPercentage: 5, responseDescription: "Implement agile practices." },
+        { name: "Technical Debt", type: "Technical", likelihood: 3, impact: 4, minCost: 4000, costPercentage: 4, responseDescription: "Plan refactoring cycles." },
+        { name: "Integration Issues", type: "Technical", likelihood: 3, impact: 3, minCost: 3000, costPercentage: 3, responseDescription: "Conduct early testing." },
+        { name: "Security Breach", type: "Security", likelihood: 2, impact: 5, minCost: 6000, costPercentage: 6, responseDescription: "Perform security audits." },
+        { name: "Team Turnover", type: "Operational", likelihood: 4, impact: 2, minCost: 2000, costPercentage: 2, responseDescription: "Enhance team culture." }
     ];
 
     cheatRisks.forEach(function(riskData) {
         var riskScore = riskData.likelihood * riskData.impact;
         var riskLevel = getRiskLevel(riskScore);
-
-        var risk = {
+        risks.push({
             name: riskData.name,
             type: riskData.type,
             likelihood: riskData.likelihood,
@@ -164,13 +116,16 @@ function generateCheatRisks() {
             level: riskLevel,
             occurred: false,
             responseDescription: riskData.responseDescription
-        };
-
-        risks.push(risk);
+        });
     });
 }
 
 function addRisk() {
+    if (risks.length >= 5) {
+        alert("Maximum of 5 risks reached!");
+        return;
+    }
+
     var riskName = document.getElementById('riskName').value;
     var riskType = document.getElementById('riskType').value;
     var likelihood = parseInt(document.getElementById('likelihood').value);
@@ -183,7 +138,6 @@ function addRisk() {
         alert("Please enter a risk name.");
         return;
     }
-
     if (riskResponseDescription.trim() === "") {
         alert("Please enter a risk response description.");
         return;
@@ -191,8 +145,7 @@ function addRisk() {
 
     var riskScore = likelihood * impact;
     var riskLevel = getRiskLevel(riskScore);
-
-    var risk = {
+    risks.push({
         name: riskName,
         type: riskType,
         likelihood: likelihood,
@@ -203,14 +156,18 @@ function addRisk() {
         level: riskLevel,
         occurred: false,
         responseDescription: riskResponseDescription
-    };
+    });
 
-    risks.push(risk);
     updateRiskTable();
     document.getElementById('riskName').value = "";
     document.getElementById('minCost').value = "5000";
     document.getElementById('costPercentage').value = "5";
     document.getElementById('riskResponseDescription').value = "";
+
+    // Show export button after 3 risks
+    if (risks.length >= 3) {
+        document.getElementById('exportButton').classList.remove('hidden');
+    }
 }
 
 function getRiskLevel(score) {
@@ -229,27 +186,26 @@ function updateRiskTable() {
             <th>Likelihood</th>
             <th>Impact</th>
             <th>Min Cost (€)</th>
-            <th>Cost (% of Budget)</th>
+            <th>Cost (%)</th>
             <th>Risk Score</th>
             <th>Risk Level</th>
-            <th>Risk Response Description</th>
+            <th>Risk Response</th>
         </tr>
     `;
-
     risks.forEach(function(risk) {
         var row = table.insertRow();
+        var riskLevelClass = getRiskLevelClass(risk.level);
         row.innerHTML = `
             <td class="left-align">${risk.name}</td>
             <td>${risk.type}</td>
             <td>${risk.likelihood}</td>
             <td>${risk.impact}</td>
             <td class="right-align">${risk.minCost.toLocaleString()}</td>
-            <td>${risk.costPercentage}%</td>
+            <td class="right-align">${risk.costPercentage}%</td>
             <td>${risk.score}</td>
-            <td>${risk.level}</td>
+            <td class="${riskLevelClass}">${risk.level}</td>
             <td class="left-align">${risk.responseDescription}</td>
         `;
-        row.classList.add(getRiskLevelClass(risk.level));
     });
 }
 
@@ -264,11 +220,10 @@ function getRiskLevelClass(level) {
 }
 
 function proceedToSimulation() {
-    if (risks.length < 5) {
-        alert("Please add at least 5 risks before proceeding.");
+    if (risks.length !== 5) {
+        alert("Please add exactly 5 risks before proceeding.");
         return;
     }
-
     document.getElementById('game').classList.add('hidden');
     document.getElementById('simulation').classList.remove('hidden');
     updateProjectStatus();
@@ -276,15 +231,30 @@ function proceedToSimulation() {
     initializeCharts();
 }
 
+function exportRiskRegister() {
+    if (risks.length === 0) {
+        alert("No risks to export.");
+        return;
+    }
+    let csvContent = "Risk Name,Type,Likelihood,Impact,Min Cost (€),Cost (% of Budget),Risk Score,Risk Level,Risk Response Description\n";
+    risks.forEach(risk => {
+        csvContent += `${risk.name},${risk.type},${risk.likelihood},${risk.impact},${risk.minCost},${risk.costPercentage}%,${risk.score},${risk.level},${risk.responseDescription}\n`;
+    });
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `risk_register_${timestamp}.csv`;
+    link.click();
+}
+
 function nextTurn() {
     if (gameOver) return;
-
     currentTurn++;
     if (currentTurn > project.duration) {
         checkWinCondition();
         return;
     }
-
     project.budget -= project.baselineCostPerTurn;
     var riskEvent = checkForRiskEvent();
     if (riskEvent) {
@@ -294,9 +264,9 @@ function nextTurn() {
             <p>Type: ${riskEvent.type}</p>
             <p>Likelihood: ${riskEvent.likelihood}</p>
             <p>Impact: ${riskEvent.impact}</p>
-            <p>Minimum Cost if Occurs: €${riskEvent.minCost.toLocaleString()}</p>
+            <p>Minimum Cost: €${riskEvent.minCost.toLocaleString()}</p>
             <p>Cost as % of Budget: ${riskEvent.costPercentage}%</p>
-            <p>Risk Response Description: ${riskEvent.responseDescription}</p>
+            <p>Risk Response: ${riskEvent.responseDescription}</p>
         `;
         document.getElementById('nextTurnButton').disabled = true;
         currentRiskEvent = riskEvent;
@@ -306,8 +276,6 @@ function nextTurn() {
         checkWinCondition();
     }
 }
-
-var currentRiskEvent = null;
 
 function checkForRiskEvent() {
     var shuffledRisks = risks.slice().sort(() => 0.5 - Math.random());
@@ -336,17 +304,10 @@ function respondToRisk() {
     var costImpact = Math.max(costFromMin, costFromPercentage);
 
     switch (response) {
-        case "Mitigate":
-            costImpact *= 0.5;
-            break;
-        case "Avoid":
-            costImpact *= 0.75;
-            break;
-        case "Transfer":
-            costImpact *= 0.25;
-            break;
-        case "Accept":
-            break;
+        case "Mitigate": costImpact *= 0.5; break;
+        case "Avoid": costImpact *= 0.75; break;
+        case "Transfer": costImpact *= 0.25; break;
+        case "Accept": break;
     }
 
     if (project.riskContingencyBudget >= costImpact) {
@@ -359,21 +320,20 @@ function respondToRisk() {
 
     var timeImpact = currentRiskEvent.impact * 0.02 * project.originalDuration;
     switch (response) {
-        case "Mitigate":
-            project.duration += timeImpact * 0.5;
-            break;
-        case "Avoid":
-            project.duration += timeImpact * 0.75;
-            break;
-        case "Transfer":
-            project.duration += timeImpact * 0.25;
-            break;
-        case "Accept":
-            project.duration += timeImpact;
-            break;
+        case "Mitigate": project.duration += timeImpact * 0.5; break;
+        case "Avoid": project.duration += timeImpact * 0.75; break;
+        case "Transfer": project.duration += timeImpact * 0.25; break;
+        case "Accept": project.duration += timeImpact; break;
     }
 
     project.quality -= currentRiskEvent.impact * 2;
+    performanceLog.push({
+        turn: currentTurn,
+        risk: currentRiskEvent.name,
+        response: response,
+        costImpact: costImpact,
+        quality: project.quality
+    });
 
     document.getElementById('riskEvent').classList.add('hidden');
     document.getElementById('nextTurnButton').disabled = false;
@@ -391,17 +351,19 @@ function updateProjectStatus() {
     document.getElementById('qualityProgress').style.width = qualityPercent + '%';
     document.getElementById('riskContingencyProgress').style.width = riskContingencyPercent + '%';
 
-    var timeRemaining = Math.max(project.duration - currentTurn, 0);
-    timeRemaining = timeRemaining.toFixed(1);
-
-    var status = `
+    var timeRemaining = Math.max(project.duration - currentTurn, 0).toFixed(1);
+    document.getElementById('projectStatus').innerHTML = `
         <p>Turn: ${currentTurn} / ${project.originalDuration}</p>
         <p>Budget Remaining: €${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-        <p>Risk Contingency Remaining: €${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+        <p>Risk Contingency: €${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
         <p>Time Remaining: ${timeRemaining} months</p>
         <p>Quality: ${project.quality}%</p>
     `;
-    document.getElementById('projectStatus').innerHTML = status;
+
+    var realTimeScore = calculateFinalScore();
+    document.getElementById('scoreValue').innerText = realTimeScore + "%";
+    var emoji = realTimeScore > 80 ? "🎉" : realTimeScore > 50 ? "👍" : "⚠️";
+    document.getElementById('realTimeScore').innerHTML = `Current Score: <span id="scoreValue">${realTimeScore}%</span> ${emoji}`;
 
     if (project.budget <= 0 || project.quality <= 0) {
         gameOver = true;
@@ -421,50 +383,37 @@ function checkWinCondition() {
 
 function finalizeGame(isSuccess) {
     document.getElementById('simulation').classList.add('hidden');
-
     let finalScore = calculateFinalScore();
-
+    let grade = getGrade(finalScore);
     let budgetRemaining = (project.budget / project.originalBudget) * 100;
     let riskContingencyRemaining = (project.riskContingencyBudget / project.originalRiskContingencyBudget) * 100;
+
     let finalInfo = `
-        <p><strong>Final Budget Remaining:</strong> €${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${budgetRemaining.toFixed(2)}%)</p>
-        <p><strong>Final Risk Contingency Remaining:</strong> €${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${riskContingencyRemaining.toFixed(2)}%)</p>
-        <p><strong>Final Quality Percentage:</strong> ${project.quality}%</p>
+        <p><strong>Final Budget:</strong> €${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${budgetRemaining.toFixed(2)}%)</p>
+        <p><strong>Final Contingency:</strong> €${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${riskContingencyRemaining.toFixed(2)}%)</p>
+        <p><strong>Final Quality:</strong> ${project.quality}%</p>
     `;
 
-    let message;
-    if (isSuccess) {
-        message = `
-            <h2>Congratulations! Project Completed Successfully</h2>
-            <p>You delivered the software project on budget and maintained high quality.</p>
-            <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnd2d3lrZGhxbm5zZDdkYmI1Zng5Y2VjZGdjYW02dHc3eDdiaHk5cyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/hcnh1VGMNW3Sb8c5aX/giphy.gif" alt="Success GIF">
-        `;
-    } else {
-        var failureReason = '';
-        if (project.budget <= 0 && project.quality <= 50) {
-            failureReason = 'Your project ran out of budget and quality fell below acceptable levels.';
-        } else if (project.budget <= 0) {
-            failureReason = 'Your project ran out of budget before completion.';
-        } else if (project.quality <= 50) {
-            failureReason = 'Your project quality was too low.';
-        } else {
-            failureReason = 'Your project could not be completed successfully.';
-        }
+    let message = isSuccess ?
+        `<h2>Congratulations! Project Completed</h2><p>You delivered the project successfully.</p><img src="https://media0.giphy.com/media/hcnh1VGMNW3Sb8c5aX/giphy.gif" alt="Success">` :
+        `<h2>Game Over: Project Failed</h2><p>${project.budget <= 0 ? "Out of budget" : "Quality too low"}</p><img src="https://media1.giphy.com/media/BGlGy3pD9THOFVzdtf/giphy.gif" alt="Failure">`;
 
-        message = `
-            <h2>Game Over: Project Failed</h2>
-            <p>${failureReason}</p>
-            <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnRqcmNzZGhoc2ZidGs5bWN2MWI0MXVucjVqcWozM294a3Vid3NvNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BGlGy3pD9THOFVzdtf/giphy.gif" alt="Failure GIF">
-        `;
-    }
+    let logHtml = "<h3>Performance Log</h3><ul>";
+    performanceLog.forEach(entry => {
+        logHtml += `<li>Turn ${entry.turn}: Risk "${entry.risk}" - Response: ${entry.response} - Cost: €${entry.costImpact.toLocaleString()} - Quality: ${entry.quality}%</li>`;
+    });
+    logHtml += "</ul>";
 
     document.getElementById('finalResult').innerHTML = `
         <h2>Simulation Results</h2>
         ${finalInfo}
         <h3>Your Overall Score</h3>
-        <p><strong>${finalScore}%</strong></p>
+        <p><strong>${finalScore}%</strong> - Grade: ${grade}</p>
         ${message}
+        ${logHtml}
         <button class="button-action" onclick="window.print()">Print Results</button>
+        <button class="button-action" onclick="exportPerformanceLog()">Export Log</button>
+        <button class="button-action" onclick="tryAgain()">Try It Again</button>
     `;
     document.getElementById('finalResult').classList.remove('hidden');
 }
@@ -473,153 +422,133 @@ function calculateFinalScore() {
     let budgetRemaining = (project.budget / project.originalBudget) * 100;
     let riskContingencyRemaining = (project.riskContingencyBudget / project.originalRiskContingencyBudget) * 100;
     let qualityRemaining = project.quality;
-
     let score = (budgetRemaining * 0.4) + (qualityRemaining * 0.4) + (riskContingencyRemaining * 0.2);
     return Math.min(score.toFixed(2), 100);
+}
+
+function getGrade(score) {
+    if (score >= 90) return "5 (Excellent)";
+    else if (score >= 75) return "4 (Good)";
+    else if (score >= 60) return "3 (Satisfactory)";
+    else if (score >= 40) return "2 (Needs Improvement)";
+    else if (score >= 20) return "1 (Poor)";
+    else return "0 (Fail)";
 }
 
 function initializeCharts() {
     turnLabels.push("0");
     budgetData.push(project.budget);
     qualityData.push(project.quality);
-
-    var ctxBudget = document.getElementById('budgetChart').getContext('2d');
-    budgetChart = new Chart(ctxBudget, {
-        type: 'line',
-        data: {
-            labels: turnLabels,
-            datasets: [{
-                label: 'Budget Remaining (€)',
-                data: budgetData,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                fill: false,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { display: true, title: { display: true, text: 'Turn' } },
-                y: { display: true, title: { display: true, text: 'Budget (€)' }, beginAtZero: true }
-            }
-        }
-    });
-
-    var ctxQuality = document.getElementById('qualityChart').getContext('2d');
-    qualityChart = new Chart(ctxQuality, {
-        type: 'line',
-        data: {
-            labels: turnLabels,
-            datasets: [{
-                label: 'Project Quality (%)',
-                data: qualityData,
-                borderColor: 'rgba(255, 99, 132, 1)',
-                fill: false,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { display: true, title: { display: true, text: 'Turn' } },
-                y: { display: true, title: { display: true, text: 'Quality (%)' }, min: 0, max: 100 }
-            }
-        }
-    });
+    updateCharts();
 }
 
 function updateCharts() {
     turnLabels.push(currentTurn.toString());
     budgetData.push(project.budget);
     qualityData.push(project.quality);
-    budgetChart.update();
-    qualityChart.update();
+
+    const maxBudget = project.originalBudget;
+    const svgWidth = 400, svgHeight = 200, padding = 40;
+    const xScale = (svgWidth - padding * 2) / (turnLabels.length - 1);
+    const yScaleBudget = (svgHeight - padding * 2) / maxBudget;
+    const yScaleQuality = (svgHeight - padding * 2) / 100;
+
+    const budgetSvg = document.getElementById('budgetChartSvg');
+    budgetSvg.innerHTML = `<text x="180" y="20" text-anchor="middle">Budget (€)</text>`;
+    let budgetPath = `M${padding},${svgHeight - padding - budgetData[0] * yScaleBudget}`;
+    for (let i = 1; i < budgetData.length; i++) {
+        budgetPath += ` L${padding + i * xScale},${svgHeight - padding - budgetData[i] * yScaleBudget}`;
+    }
+    const budgetLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    budgetLine.setAttribute("d", budgetPath);
+    budgetLine.setAttribute("stroke", "rgba(75, 192, 192, 1)");
+    budgetLine.setAttribute("fill", "none");
+    budgetSvg.appendChild(budgetLine);
+
+    const qualitySvg = document.getElementById('qualityChartSvg');
+    qualitySvg.innerHTML = `<text x="180" y="20" text-anchor="middle">Quality (%)</text>`;
+    let qualityPath = `M${padding},${svgHeight - padding - qualityData[0] * yScaleQuality}`;
+    for (let i = 1; i < qualityData.length; i++) {
+        qualityPath += ` L${padding + i * xScale},${svgHeight - padding - qualityData[i] * yScaleQuality}`;
+    }
+    const qualityLine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    qualityLine.setAttribute("d", qualityPath);
+    qualityLine.setAttribute("stroke", "rgba(255, 99, 132, 1)");
+    qualityLine.setAttribute("fill", "none");
+    qualitySvg.appendChild(qualityLine);
 }
 
 function addRiskResponseListener() {
     var riskResponseSelect = document.getElementById('riskResponse');
     riskResponseSelect.addEventListener('change', function() {
         var response = riskResponseSelect.value;
-        var explanationDiv = document.getElementById('responseExplanation');
-        var explanation = getResponseExplanation(response);
-        explanationDiv.innerHTML = explanation;
+        document.getElementById('responseExplanation').innerHTML = getResponseExplanation(response);
     });
 }
 
 function getResponseExplanation(response) {
     switch(response) {
-        case "Mitigate":
-            return `
-                <strong>Mitigate:</strong> Take actions to reduce the likelihood or impact of the risk.<br>
-                <em>Example:</em> Implement code reviews and refactoring sessions.
-            `;
-        case "Avoid":
-            return `
-                <strong>Avoid:</strong> Change plans to eliminate the risk entirely.<br>
-                <em>Example:</em> Modify project scope to exclude high-risk features.
-            `;
-        case "Transfer":
-            return `
-                <strong>Transfer:</strong> Shift the risk to a third party, such as outsourcing or insurance.<br>
-                <em>Example:</em> Outsource non-core functionalities to mitigate risk.
-            `;
-        case "Accept":
-            return `
-                <strong>Accept:</strong> Acknowledge the risk and decide to manage it if it occurs.<br>
-                <em>Example:</em> Proceed without additional measures for minor risks.
-            `;
-        default:
-            return "";
+        case "Mitigate": return "<strong>Mitigate:</strong> Reduce likelihood or impact.<br><em>Example:</em> Add code reviews.";
+        case "Avoid": return "<strong>Avoid:</strong> Eliminate the risk.<br><em>Example:</em> Cut high-risk features.";
+        case "Transfer": return "<strong>Transfer:</strong> Shift to a third party.<br><em>Example:</em> Outsource.";
+        case "Accept": return "<strong>Accept:</strong> Manage if it occurs.<br><em>Example:</em> Proceed as is.";
+        default: return "";
     }
 }
 
-function exportRiskRegister() {
-    if (risks.length === 0) {
-        alert("No risks to export.");
-        return;
-    }
-
-    var ws_data = [
-        ["Risk Name", "Type", "Likelihood", "Impact", "Min Cost (€)", "Cost (% of Budget)", "Risk Score", "Risk Level", "Risk Response Description"]
-    ];
-
-    risks.forEach(function(risk) {
-        ws_data.push([
-            risk.name,
-            risk.type,
-            risk.likelihood,
-            risk.impact,
-            risk.minCost,
-            risk.costPercentage + "%",
-            risk.score,
-            risk.level,
-            risk.responseDescription
-        ]);
+function exportPerformanceLog() {
+    let csvContent = "Turn,Risk,Response,Cost Impact (€),Quality (%)\n";
+    performanceLog.forEach(entry => {
+        csvContent += `${entry.turn},${entry.risk},${entry.response},${entry.costImpact},${entry.quality}\n`;
     });
-
-    var ws = XLSX.utils.aoa_to_sheet(ws_data);
-    var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Risk Register");
-    var timestamp = new Date().toISOString().slice(0,19).replace(/[:T]/g, "-");
-    XLSX.writeFile(wb, "risk_register_" + timestamp + ".xlsx");
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `performance_log_${timestamp}.csv`;
+    link.click();
 }
 
 function setupHelpModal() {
     var modal = document.getElementById('helpModal');
     var btn = document.getElementById('helpButton');
     var span = document.getElementsByClassName('close')[0];
-
-    btn.onclick = function() {
-        modal.style.display = "block";
-    }
-
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-
+    btn.onclick = function() { modal.style.display = "block"; };
+    span.onclick = function() { modal.style.display = "none"; };
     window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
+        if (event.target == modal) modal.style.display = "none";
+    };
+}
+
+function goBack() {
+    if (document.getElementById('setup').classList.contains('hidden')) {
+        alert("Cannot go back during gameplay.");
+    } else {
+        window.location.reload();
     }
+}
+
+function tryAgain() {
+    project = {};
+    risks = [];
+    currentTurn = 0;
+    gameOver = false;
+    budgetData = [];
+    qualityData = [];
+    turnLabels = [];
+    currentRiskEvent = null;
+    performanceLog = [];
+
+    document.getElementById('finalResult').classList.add('hidden');
+    document.getElementById('setup').classList.remove('hidden');
+    document.getElementById('game').classList.add('hidden');
+    document.getElementById('simulation').classList.add('hidden');
+    document.getElementById('backButtonSetup').disabled = false;
+    document.getElementById('projectName').value = "";
+    document.getElementById('projectBudget').value = "100";
+    document.getElementById('projectDuration').value = "24";
+    document.getElementById('riskContingencyPercentage').value = "10";
+    document.getElementById('exportButton').classList.add('hidden');
+    setDefaultProjectName();
+    updateBaselineCost();
 }

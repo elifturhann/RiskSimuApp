@@ -62,6 +62,9 @@ function startGame() {
     var baselineCostPerTurn = parseFloat(document.getElementById('baselineCost').value) * 1000;
     var riskContingencyPercentage = parseFloat(document.getElementById('riskContingencyPercentage').value);
 
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('game').style.display = 'block';
+
     if (projectNameInput === "") {
         alert("Please enter a project name.");
         return;
@@ -95,8 +98,8 @@ function startGame() {
         quality: 100
     };
 
-    document.getElementById('setup').classList.add('hidden');
-    document.getElementById('game').classList.remove('hidden');
+
+
     updateRiskTable();
 }
 
@@ -168,6 +171,7 @@ function generateCheatRisks() {
 
         risks.push(risk);
     });
+    
 }
 
 function addRisk() {
@@ -268,6 +272,10 @@ function proceedToSimulation() {
         alert("Please add at least 5 risks before proceeding.");
         return;
     }
+    document.getElementById('game').style.display = 'none';
+
+    // Show the "Simulation" section
+    document.getElementById('simulation').style.display = 'block';
 
     document.getElementById('game').classList.add('hidden');
     document.getElementById('simulation').classList.remove('hidden');
@@ -623,3 +631,42 @@ function setupHelpModal() {
         }
     }
 }
+function endSimulation() {
+    // Hide the "Simulation" section
+    document.getElementById('simulation').style.display = 'none';
+
+    // Show the "Simulation Results" section
+    document.getElementById('finalResult').style.display = 'block';
+}
+
+
+
+//! 
+
+
+
+// Function to start the game and hide the setup section
+// function startGame() {
+//     document.getElementById('setup').style.display = 'none'; // Hide setup section
+//     document.getElementById('game').style.display = 'block'; // Show game section
+// }
+
+// // Function to proceed to the simulation section and hide the game section
+// function proceedToSimulation() {
+//     document.getElementById('game').style.display = 'none'; // Hide game section
+//     document.getElementById('simulation').style.display = 'block'; // Show simulation section
+// }
+
+// // Function to proceed to the final result section and hide the simulation section
+// function proceedToFinalResult() {
+//     document.getElementById('simulation').style.display = 'none'; // Hide simulation section
+//     document.getElementById('finalResult').style.display = 'block'; // Show final result section
+// }
+
+// // Function to restart the game and show the setup section again
+// function restartGame() {
+//     document.getElementById('setup').style.display = 'block'; // Show setup section
+//     document.getElementById('game').style.display = 'none'; // Hide game section
+//     document.getElementById('simulation').style.display = 'none'; // Hide simulation section
+//     document.getElementById('finalResult').style.display = 'none'; // Hide final result section
+// }

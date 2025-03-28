@@ -1,15 +1,101 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
-    text-align: left;
-    margin-left: 20px;
+    background-image: url('./assets/Gradientbg.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 0;
 }
+#header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    background-color: #FFFFFF;
+    padding: 10px;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#header .logo {
+    max-width: 200px;
+    display: inline-block;
+}
+.container{
+    height: auto;
+    width: 50%;
+    padding: 30px ;
+    border-radius: 20px;
+    margin: auto;
+    margin-top: 60px;
+    left: 50%;
+    top: 50%;
+    background-color:#FFFFFF;
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+     
+
+}
+
+#setup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    gap: 5px; 
+}
+
+.form-group label,
+.form-group input {
+    display: inline-block;
+    text-align: left;
+    width: 100%; 
+    max-width: 300px; 
+}
+.risk-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+}
+
+.form-row label {
+    width: 200px; 
+    text-align: right;
+    margin-right: 10px;
+}
+
+.form-row input,
+.form-row select {
+    width: 200px; 
+}
+
+.button-action {
+    margin-top: 10px;
+}
+
 input, button, select {
     margin: 5px;
+   
 }
 input[readonly] {
     background-color: #e9e9e9;
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -31,7 +117,9 @@ th {
     text-align: center;
 }
 .hidden {
-    display: none;
+    margin: 0;
+    padding: 0;
+    
 }
 .low {
     background-color: #c6efce;
@@ -82,11 +170,12 @@ th {
 }
 .button-action {
     background-color: #4CAF50;
-    color: black;
-    font-weight: bold;
-    padding: 10px 20px;
+    color: white;
+    padding: 15px 10px;
     border: none;
+    border-radius: 10px;
     cursor: pointer;
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
 }
 .button-action:hover {
     background-color: #45a049;
@@ -108,8 +197,8 @@ th {
     display: inline-block;
 }
 #helpButton {
-    position: fixed;
-    top: 20px;
+    //position: fixed;
+    top: 50px;
     right: 20px;
     background-color: #008CBA;
     color: white;
@@ -118,6 +207,7 @@ th {
     cursor: pointer;
     border-radius: 5px;
     font-size: 16px;
+    box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
 }
 #helpButton:hover {
     background-color: #005f6a;

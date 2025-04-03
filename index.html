@@ -3,29 +3,32 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' 'inline-speculation-rules' chrome-extension://ee91a8dc-b6cf-41c9-aaa8-9883e66c1512/ https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
+   
     <title>Risk Simulation Game for Software Engineering</title>
     <link rel="stylesheet" href="style.css">
     <!-- Include Chart.js from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Include SheetJS from CDN for Excel Export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script type="text/javascript" src="main.js"></script>
+    <script nonce="random123" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script nonce="random123" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script nonce="random123" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- For the CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
 </head>
 <body>
     <div class="container">
-
-    <div class="header">
+        <div class="header">
         <!-- Help Button -->
-        <button id="helpButton">Help</button>
+       <button id="helpButton">Help</button>
         <!-- Logo Image -->
         <img src="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg" alt="VAMK Logo" class="logo" style="max-width: 200px; margin: auto; justify-content: center;align-items: center;display: flex; padding-bottom: 20px; ">
-    </div>
-    
-    
     
     <h1 class="game-title" style="text-align: center;">Risk Simulation Game for Software Engineering</h1>
     <p  class="game-description" style="text-align: center;">In this interactive simulation, you take on the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks. Your strategic decisions will determine the project's outcome. Created by Thomas Vikström (v.0.1 - 10.2.2025 19:00)</p>
- 
+    </div>
+    
     <!-- Project Setup -->
     <div id="setup">
       <div class="form-group">
@@ -47,7 +50,7 @@
         <label for="riskContingencyPercentage">Risk Contingency Budget (% of Total Budget):</label>
         <input type="number" id="riskContingencyPercentage" value="10"><br>
 
-        <button class="button-action" onclick="startGame()">Start Game</button>
+        <button id="startGameButton" class="button-action">Start Game</button>
       </div>
     </div>
 </div>
@@ -55,7 +58,7 @@
     <!-- Game and Simulation Sections -->
      <div class="container">
        
-    <div id="game"  class="hidden" style="display: none;">
+    <div id="game"  class="hidden" >
         <h2 style="text-align: center;">Add a Risk (Add at least 5 risks!)</h2>
         <div class="risk-group">
             <div class="form-row">
@@ -96,7 +99,7 @@
         </div>
 
 
-        <h2>Risk Register</h2>
+        <h2 style="text-align: center;">Risk Register</h2>
         <!-- Button Container for Alignment -->
         <div style="display: flex; justify-content: space-between; margin-top: 10px;">
             <button class="button-action" onclick="proceedToSimulation()">Proceed to Simulation</button>
@@ -119,7 +122,7 @@
 </div>
 
 <div class="container">
-    <div id="simulation" class="hidden" style="display: none;">
+    <div id="simulation" class="hidden" >
         <h2>Simulation</h2>
         <p id="simulationInfo"></p>
 
@@ -172,7 +175,7 @@
 
 <div class="container">
     <!-- Final Project Result Section -->
-    <div id="finalResult" class="hidden" style="display: none;">
+    <div id="finalResult" class="hidden" >
         <h2>Simulation Results</h2>
         <div id="finalProjectInfo"></div>
         <h3>Your Overall Score</h3>
@@ -269,6 +272,38 @@
 
     <!-- JavaScript Code -->
    
+    <script nonce="random123" type="text/javascript" src="main.js"></script>
+    <!-- <script>
+        function showContainer(containerId) {
+        console.log('Showing container:', containerId);
+        document.getElementById(containerId).style.display = 'block';
+    }
+
+    function hideContainer(containerId) {
+        console.log('Hiding container:', containerId);
+        document.getElementById(containerId).style.display = 'none';
+    }
+
+    function startGame() {
+        hideContainer('setup');
+        showContainer('game');
+    }
+
+    function proceedToSimulation() {
+        hideContainer('game');
+        showContainer('simulation');
+    }
+
+    function showFinalResult() {
+        hideContainer('simulation');
+        showContainer('finalResult');
+    }
+
     
+    hideContainer('game');
+    hideContainer('simulation');
+    hideContainer('finalResult');
+    showContainer('setup');
+    </script> -->
 </body>
 </html>

@@ -1,3 +1,5 @@
+
+
 var project = {};
 var risks = [];
 var currentTurn = 0;
@@ -9,6 +11,9 @@ var turnLabels = [];
 
 var budgetChart;
 var qualityChart;
+var startGameButton;
+
+
 
 window.onload = function() {
     setDefaultProjectName();
@@ -55,28 +60,70 @@ function updateBaselineCost() {
     document.getElementById('baselineCost').value = baselineCostPerTurn.toFixed(2);
 }
 
-function startGame() {
+
+document.addEventListener("DOMContentLoaded", function() {
+    startGameButton = document.getElementById("startGameButton");  // Assign button
+    if (startGameButton) {
+        startGameButton.addEventListener("click", startGame);
+        console.log("Start Game button found and event listener added.");
+    } else {
+        console.log("⚠️ Error: Start Game button NOT found!");
+    }
+    // startGameButton.disabled = true; // Disable the button
+    // console.log("Button disabled status:", startGameButton.disabled);
+
+    // console.log("Game should start now");
+});
+
+
+function startGame(event) {
+    event.preventDefault();
+    console.log("Start game function triggered");
+
+    if (startGameButton) {
+        console.log("Button disabled status:", startGameButton.disabled);
+    } else {
+        console.log("startGameButton is not defined");
+    }
+
     var projectNameInput = document.getElementById('projectName').value;
     var projectBudget = parseFloat(document.getElementById('projectBudget').value) * 1000;
     var projectDuration = parseInt(document.getElementById('projectDuration').value);
     var baselineCostPerTurn = parseFloat(document.getElementById('baselineCost').value) * 1000;
     var riskContingencyPercentage = parseFloat(document.getElementById('riskContingencyPercentage').value);
 
-    document.getElementById('setup').style.display = 'none';
-    document.getElementById('game').style.display = 'block';
-
     if (projectNameInput === "") {
-        alert("Please enter a project name.");
+        console.log("Project name is empty, showing Swal");
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please enter a project name.',
+            icon: 'error',
+            confirmButtonText: 'Cool'
+        }).then(() => {
+            console.log("Swal modal closed");
+        });
         return;
     }
 
     if (isNaN(baselineCostPerTurn) || baselineCostPerTurn <= 0) {
-        alert("Invalid Baseline Cost per Turn. Please check your Project Budget and Duration.");
+        console.log("Invalid Baseline Cost per Turn, showing Swal");
+        Swal.fire({
+            title: 'Error!',
+            text: 'Invalid Baseline Cost per Turn. Please check your Project budget and duration.',
+            icon: 'error',
+            confirmButtonText: 'Cool'
+        }).then(() => {
+            console.log("Swal modal closed");
+        });
         return;
     }
 
-    // Cheat function activation (if project name is "tv")
-    if (projectNameInput.trim().toLowerCase() === "tv") {
+    console.log("Game should start now");
+    console.log("Button disabled status:", startGameButton.disabled);
+
+
+    // Cheat function activation (if project name is "risk")
+    if (projectNameInput.trim().toLowerCase() === "risk") {
         var currentDate = new Date();
         var dateString = formatDate(currentDate);
         var timeString = formatTime(currentDate);
@@ -98,11 +145,13 @@ function startGame() {
         quality: 100
     };
 
-
-
+    
+    document.getElementById('setup').classList.add('hidden');
+    document.getElementById('game').classList.remove('hidden');
     updateRiskTable();
 }
 
+// Move these functions outside of startGame
 function generateCheatRisks() {
     var cheatRisks = [
         {
@@ -171,7 +220,6 @@ function generateCheatRisks() {
 
         risks.push(risk);
     });
-    
 }
 
 function addRisk() {
@@ -272,11 +320,6 @@ function proceedToSimulation() {
         alert("Please add at least 5 risks before proceeding.");
         return;
     }
-    document.getElementById('game').style.display = 'none';
-
-    // Show the "Simulation" section
-    document.getElementById('simulation').style.display = 'block';
-
     document.getElementById('game').classList.add('hidden');
     document.getElementById('simulation').classList.remove('hidden');
     updateProjectStatus();
@@ -545,13 +588,14 @@ function updateCharts() {
 }
 
 function addRiskResponseListener() {
-    var riskResponseSelect = document.getElementById('riskResponse');
-    riskResponseSelect.addEventListener('change', function() {
-        var response = riskResponseSelect.value;
-        var explanationDiv = document.getElementById('responseExplanation');
-        var explanation = getResponseExplanation(response);
-        explanationDiv.innerHTML = explanation;
-    });
+    
+        var riskResponseSelect = document.getElementById('riskResponse');
+        riskResponseSelect.addEventListener('change', function() {
+            var response = riskResponseSelect.value;
+            var explanationDiv = document.getElementById('responseExplanation');
+            var explanation = getResponseExplanation(response);
+            explanationDiv.innerHTML = explanation;
+        });
 }
 
 function getResponseExplanation(response) {
@@ -631,42 +675,7 @@ function setupHelpModal() {
         }
     }
 }
-function endSimulation() {
-    // Hide the "Simulation" section
-    document.getElementById('simulation').style.display = 'none';
-
-    // Show the "Simulation Results" section
-    document.getElementById('finalResult').style.display = 'block';
-}
 
 
 
-//! 
-
-
-
-// Function to start the game and hide the setup section
-// function startGame() {
-//     document.getElementById('setup').style.display = 'none'; // Hide setup section
-//     document.getElementById('game').style.display = 'block'; // Show game section
-// }
-
-// // Function to proceed to the simulation section and hide the game section
-// function proceedToSimulation() {
-//     document.getElementById('game').style.display = 'none'; // Hide game section
-//     document.getElementById('simulation').style.display = 'block'; // Show simulation section
-// }
-
-// // Function to proceed to the final result section and hide the simulation section
-// function proceedToFinalResult() {
-//     document.getElementById('simulation').style.display = 'none'; // Hide simulation section
-//     document.getElementById('finalResult').style.display = 'block'; // Show final result section
-// }
-
-// // Function to restart the game and show the setup section again
-// function restartGame() {
-//     document.getElementById('setup').style.display = 'block'; // Show setup section
-//     document.getElementById('game').style.display = 'none'; // Hide game section
-//     document.getElementById('simulation').style.display = 'none'; // Hide simulation section
-//     document.getElementById('finalResult').style.display = 'none'; // Hide final result section
-// }
+        

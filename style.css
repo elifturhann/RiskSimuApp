@@ -1,10 +1,30 @@
 body {
     font-family: Arial, sans-serif;
-    background-image: url('./assets/Gradientbg.png');
+    /* background-image: url('./assets/Gradientbg.png');
     background-size: cover;
-    background-repeat: no-repeat;
+    background-repeat: no-repeat; */
     margin: 0;
     padding: 0;
+   
+        background: linear-gradient(300deg,#E95103, #e5007d,#a90d7f,#009ee3);
+        background-size: 180% 180%;
+        animation: gradient-animation 6s ease infinite;
+      }
+      
+      @keyframes gradient-animation {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      
 }
 #header {
     display: flex;
@@ -24,12 +44,13 @@ body {
     display: inline-block;
 }
 .container{
-    height: auto;
+    height: 75%;
     width: 50%;
     padding: 30px ;
     border-radius: 20px;
     margin: auto;
     margin-top: 60px;
+    margin-bottom: 50px;
     left: 50%;
     top: 50%;
     background-color:#FFFFFF;
@@ -59,6 +80,11 @@ body {
     text-align: left;
     width: 100%; 
     max-width: 300px; 
+    border:none;
+   
+}
+.form-group input{
+    border-bottom: 2px solid  rgba(0, 0, 0, 0.1);
 }
 .risk-group {
     display: flex;
@@ -82,8 +108,13 @@ body {
 .form-row input,
 .form-row select {
     width: 200px; 
+    border:none;
+    border-bottom: 2px solid  rgba(0, 0, 0, 0.1);
 }
-
+.riskResponse select{
+    border:none;
+    border-bottom: 2px solid  rgba(0, 0, 0, 0.1);
+}
 .button-action {
     margin-top: 10px;
 }
@@ -119,6 +150,8 @@ th {
 .hidden {
     margin: 0;
     padding: 0;
+    display: none !important;
+    
     
 }
 .low {

@@ -1,5 +1,3 @@
-
-
 var project = {};
 var risks = [];
 var currentTurn = 0;
@@ -12,15 +10,105 @@ var turnLabels = [];
 var budgetChart;
 var qualityChart;
 var startGameButton;
-
-
+var gameInProgress = false; // Flag to track if game is in progress
 
 window.onload = function() {
     setDefaultProjectName();
     addRiskResponseListener();
     updateBaselineCost();
     setupHelpModal();
+    // Add event listeners for all back buttons
+    setupBackButtons();
+    const divsToHide = ['simulation', 'finalResult', 'game'];
+    
+    divsToHide.forEach(function(divId) {
+      const div = document.getElementById(divId);
+      if (div) {
+        div.style.display = 'none';
+      }
+    });
+
+    // Add this at the very end of your window.onload function
+setTimeout(function() {
+    console.log("Forcibly hiding divs");
+    const divsToHide = ['simulation', 'finalResult', 'game'];
+    
+    divsToHide.forEach(function(divId) {
+        const div = document.getElementById(divId);
+        if (div) {
+            console.log("Hiding div:", divId);
+            div.style.display = 'none';
+        } else {
+            console.log("Div not found:", divId);
+        }
+    });
+}, 1000); // Delay by 1 second to ensure it runs after other scripts
 };
+
+// New function to set up back button event listeners
+function setupBackButtons() {
+    // Back button from game to setup
+    document.getElementById('gameBackButton').addEventListener('click', function() {
+        // Only allow going back if the game is not in progress
+        if (!gameInProgress) {
+            document.getElementById('game').classList.add('hidden');
+            document.getElementById('setup').classList.remove('hidden');
+        }
+    });
+    
+    // Back button from simulation to game
+    document.getElementById('simulationBackButton').addEventListener('click', function() {
+        // Only allow going back if the game is not in progress
+        if (!gameInProgress) {
+            document.getElementById('simulation').classList.add('hidden');
+            document.getElementById('game').classList.remove('hidden');
+        }
+    });
+    
+    // Back button from final result to setup (restart game)
+    document.getElementById('finalResultBackButton').addEventListener('click', function() {
+        document.getElementById('finalResult').classList.add('hidden');
+        document.getElementById('setup').classList.remove('hidden');
+        resetGame();
+    });
+}
+
+// New function to toggle back button state
+function toggleBackButtons(enabled) {
+    document.getElementById('gameBackButton').disabled = !enabled;
+    document.getElementById('simulationBackButton').disabled = !enabled;
+    
+    // Update the visual appearance based on state
+    if (enabled) {
+        document.getElementById('gameBackButton').classList.remove('button-disabled');
+        document.getElementById('simulationBackButton').classList.remove('button-disabled');
+    } else {
+        document.getElementById('gameBackButton').classList.add('button-disabled');
+        document.getElementById('simulationBackButton').classList.add('button-disabled');
+    }
+}
+
+// New function to reset the game state
+function resetGame() {
+    project = {};
+    risks = [];
+    currentTurn = 0;
+    gameOver = false;
+    gameInProgress = false;
+    budgetData = [];
+    qualityData = [];
+    turnLabels = [];
+    
+    // Enable back buttons
+    toggleBackButtons(true);
+    
+    // Reset form values
+    setDefaultProjectName();
+    document.getElementById('projectBudget').value = '';
+    document.getElementById('projectDuration').value = '';
+    document.getElementById('baselineCost').value = '';
+    document.getElementById('riskContingencyPercentage').value = '10';
+}
 
 function setDefaultProjectName() {
     var projectNames = ["Turing", "Ada", "Grace", "Linus", "Jobs", "Gates", "Von Neumann", "Tesla", "Dijkstra", "Knuth"];
@@ -232,13 +320,31 @@ function addRisk() {
     var riskResponseDescription = document.getElementById('riskResponseDescription').value;
 
     if (riskName === "") {
-        alert("Please enter a risk name.");
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please enter a risk name.',
+            icon: 'error',
+            confirmButtonText: 'Cool'
+        }).then(() => {
+            console.log("Swal modal closed");
+        });
         return;
+        // alert("Please enter a risk name.");
+        // return;
     }
 
     if (riskResponseDescription.trim() === "") {
-        alert("Please enter a risk response description.");
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please enter a risk response description.',
+            icon: 'error',
+            confirmButtonText: 'Cool'
+        }).then(() => {
+            console.log("Swal modal closed");
+        });
         return;
+        // alert("Please enter a risk response description.");
+        // return;
     }
 
     var riskScore = likelihood * impact;
@@ -317,8 +423,17 @@ function getRiskLevelClass(level) {
 
 function proceedToSimulation() {
     if (risks.length < 5) {
-        alert("Please add at least 5 risks before proceeding.");
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please add at least 5 risks before proceeding.',
+            icon: 'error',
+            confirmButtonText: 'Cool'
+        }).then(() => {
+            console.log("Swal modal closed");
+        });
         return;
+        // alert("Please add at least 5 risks before proceeding.");
+        // return;
     }
     document.getElementById('game').classList.add('hidden');
     document.getElementById('simulation').classList.remove('hidden');
@@ -329,6 +444,12 @@ function proceedToSimulation() {
 
 function nextTurn() {
     if (gameOver) return;
+    
+    // Set the game in progress flag
+    gameInProgress = true;
+    
+    // Disable back buttons once gameplay begins
+    toggleBackButtons(false);
 
     currentTurn++;
     if (currentTurn > project.duration) {
@@ -378,8 +499,17 @@ function checkForRiskEvent() {
 function respondToRisk() {
     var response = document.getElementById('riskResponse').value;
     if (response === "") {
-        alert("Please select a risk response action.");
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please select a risk response action.',
+            icon: 'error',
+            confirmButtonText: 'Cool'
+        }).then(() => {
+            console.log("Swal modal closed");
+        });
         return;
+        // alert("Please select a risk response action.");
+        // return;
     }
 
     var costFromMin = currentRiskEvent.minCost;
@@ -472,6 +602,9 @@ function checkWinCondition() {
 
 function finalizeGame(isSuccess) {
     document.getElementById('simulation').classList.add('hidden');
+    
+    // Game is over, we can reset the flag
+    gameInProgress = false;
 
     let finalScore = calculateFinalScore();
 
@@ -516,8 +649,16 @@ function finalizeGame(isSuccess) {
         <p><strong>${finalScore}%</strong></p>
         ${message}
         <button class="button-action" onclick="window.print()">Print Results</button>
+        <button id="finalResultBackButton" class="button-secondary">New Game</button>
     `;
     document.getElementById('finalResult').classList.remove('hidden');
+    
+    // Add event listener for the back button in the final result section
+    document.getElementById('finalResultBackButton').addEventListener('click', function() {
+        document.getElementById('finalResult').classList.add('hidden');
+        document.getElementById('setup').classList.remove('hidden');
+        resetGame();
+    });
 }
 
 function calculateFinalScore() {
@@ -627,8 +768,17 @@ function getResponseExplanation(response) {
 
 function exportRiskRegister() {
     if (risks.length === 0) {
-        alert("No risks to export.");
+        Swal.fire({
+            title: 'Error!',
+            text: 'No risks to export.',
+            icon: 'question',
+            confirmButtonText: 'Cool'
+        }).then(() => {
+            console.log("Swal modal closed");
+        });
         return;
+        // alert("No risks to export.");
+        // return;
     }
 
     var ws_data = [
@@ -675,7 +825,3 @@ function setupHelpModal() {
         }
     }
 }
-
-
-
-        

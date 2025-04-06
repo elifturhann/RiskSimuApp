@@ -1,9 +1,17 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+  }
+  * {
+    margin: 0;
+  }
+  
 body {
     font-family: Arial, sans-serif;
     /* background-image: url('./assets/Gradientbg.png');
     background-size: cover;
     background-repeat: no-repeat; */
     margin: 0;
+    line-height: 1.5;
     padding: 0;
    
         background: linear-gradient(300deg,#E95103, #e5007d,#a90d7f,#009ee3);
@@ -45,7 +53,7 @@ body {
 }
 .container{
     height: 75%;
-    width: 50%;
+    width: 60%;
     padding: 30px ;
     border-radius: 20px;
     margin: auto;
@@ -56,6 +64,15 @@ body {
     background-color:#FFFFFF;
     box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
      
+
+}
+.btn{
+   
+    font-size: 40px; 
+    cursor: pointer; 
+    border: none;
+    background: transparent; 
+    padding: 0;
 
 }
 
@@ -148,11 +165,10 @@ th {
     text-align: center;
 }
 .hidden {
-    margin: 0;
-    padding: 0;
-    display: none !important;
-    
-    
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
 }
 .low {
     background-color: #c6efce;

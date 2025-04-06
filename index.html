@@ -8,6 +8,9 @@
    
     <title>Risk Simulation Game for Software Engineering</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <!-- Include Chart.js from CDN -->
     <script nonce="random123" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script nonce="random123" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -22,6 +25,7 @@
         <div class="header">
         <!-- Help Button -->
        <button id="helpButton">Help</button>
+       
         <!-- Logo Image -->
         <img src="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg" alt="VAMK Logo" class="logo" style="max-width: 200px; margin: auto; justify-content: center;align-items: center;display: flex; padding-bottom: 20px; ">
     
@@ -59,6 +63,8 @@
      <div class="container">
        
     <div id="game"  class="hidden" >
+        <!-- Add this button near the top of your game section -->
+    <button id="gameBackButton" class="btn"><i class="fa-solid fa-chevron-left"></i></button>
         <h2 style="text-align: center;">Add a Risk (Add at least 5 risks!)</h2>
         <div class="risk-group">
             <div class="form-row">
@@ -123,6 +129,8 @@
 
 <div class="container">
     <div id="simulation" class="hidden" >
+        <!-- Add this button near the top of your simulation section -->
+    <button id="simulationBackButton" class="btn"><i class="fa-solid fa-chevron-left"></i></button>
         <h2>Simulation</h2>
         <p id="simulationInfo"></p>
 
@@ -273,37 +281,6 @@
     <!-- JavaScript Code -->
    
     <script nonce="random123" type="text/javascript" src="main.js"></script>
-    <!-- <script>
-        function showContainer(containerId) {
-        console.log('Showing container:', containerId);
-        document.getElementById(containerId).style.display = 'block';
-    }
-
-    function hideContainer(containerId) {
-        console.log('Hiding container:', containerId);
-        document.getElementById(containerId).style.display = 'none';
-    }
-
-    function startGame() {
-        hideContainer('setup');
-        showContainer('game');
-    }
-
-    function proceedToSimulation() {
-        hideContainer('game');
-        showContainer('simulation');
-    }
-
-    function showFinalResult() {
-        hideContainer('simulation');
-        showContainer('finalResult');
-    }
-
-    
-    hideContainer('game');
-    hideContainer('simulation');
-    hideContainer('finalResult');
-    showContainer('setup');
-    </script> -->
+   
 </body>
 </html>

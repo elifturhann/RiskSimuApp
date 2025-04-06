@@ -3,27 +3,40 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' 'inline-speculation-rules' chrome-extension://ee91a8dc-b6cf-41c9-aaa8-9883e66c1512/ https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
+   
     <title>Risk Simulation Game for Software Engineering</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <!-- Include Chart.js from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Include SheetJS from CDN for Excel Export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script type="text/javascript" src="main.js"></script>
+    <script nonce="random123" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script nonce="random123" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script nonce="random123" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- For the CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
 </head>
 <body>
-    <!-- Help Button -->
-    <button id="helpButton">Help</button>
-
-    <!-- Logo Image -->
-    <img src="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg" alt="VAMK Logo" style="max-width: 200px; margin: 0 auto 20px auto; display: block;">
-
-    <h1>Risk Simulation Game for Software Engineering</h1>
-    <p>In this interactive simulation, you take on the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks. Your strategic decisions will determine the project's outcome. Created by Thomas Vikström (v.0.1 - 10.2.2025 19:00)</p>
-
+    <div class="container">
+        <div class="header">
+        <!-- Help Button -->
+       <button id="helpButton">Help</button>
+       
+        <!-- Logo Image -->
+        <!-- <img src="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg" alt="VAMK Logo" class="logo" style="max-width: 200px; margin: auto; justify-content: center;align-items: center;display: flex; padding-bottom: 20px; "> -->
+        <img src="assets/favicon.png" alt="header" style="text-align: center; max-width: 550px; margin: auto; justify-content: center;align-items: center;display: flex; padding-bottom: 20px;">
+    <!-- <h1 class="game-title" style="text-align: center;">Risk Simulation Game for Software Engineering</h1> -->
+    <p  class="game-description" style="text-align: center;">In this interactive simulation, you take on the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks. Your strategic decisions will determine the project's outcome.</p><br>
+    </div>
+    
     <!-- Project Setup -->
     <div id="setup">
-        <h2>Project Setup</h2>
+      <div class="form-group">
+        <h2 style="text-align: center;">Project Setup</h2>
         <label for="projectName">Project Name:</label>
         <input type="text" id="projectName"><br>
 
@@ -41,43 +54,58 @@
         <label for="riskContingencyPercentage">Risk Contingency Budget (% of Total Budget):</label>
         <input type="number" id="riskContingencyPercentage" value="10"><br>
 
-        <button class="button-action" onclick="startGame()">Start Game</button>
+        <button id="startGameButton" class="button-action">Start Game</button>
+      </div>
     </div>
+</div>
 
     <!-- Game and Simulation Sections -->
-    <div id="game" class="hidden">
-        <h2>Add a Risk (Add at least 5 risks!)</h2>
-        <label for="riskName">Risk Name:</label>
-        <input type="text" id="riskName" placeholder="e.g., Requirement Creep"><br>
+     <div class="container">
+       
+    <div id="game"  class="hidden" >
+        <!-- Add this button near the top of your game section -->
+    <button id="gameBackButton" class="btn"><i class="fa-solid fa-chevron-left"></i></button>
+        <h2 style="text-align: center;">Add a Risk (Add at least 5 risks!)</h2>
+        <div class="risk-group">
+            <div class="form-row">
+                <label for="riskName">Risk Name:</label>
+                <input type="text" id="riskName" placeholder="e.g., Requirement Creep">
+            </div>
+            <div class="form-row">
+                <label for="riskType">Risk Type:</label>
+                <select id="riskType">
+                    <option value="Technical">Technical</option>
+                    <option value="Operational">Operational</option>
+                    <option value="Security">Security</option>
+                    <option value="Scope">Scope</option>
+                    <option value="Management">Management</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="likelihood">Likelihood (1-5):</label>
+                <input type="number" id="likelihood" min="1" max="5" value="3">
+            </div>
+            <div class="form-row">
+                <label for="impact">Impact (1-5):</label>
+                <input type="number" id="impact" min="1" max="5" value="3">
+            </div>
+            <div class="form-row">
+                <label for="minCost">Minimum Cost if Occurs (€):</label>
+                <input type="number" id="minCost" value="5000">
+            </div>
+            <div class="form-row">
+                <label for="costPercentage">Cost as % of Budget:</label>
+                <input type="number" id="costPercentage" value="5">
+            </div>
+            <div class="form-row">
+                <label for="riskResponseDescription">Risk Response Description:</label>
+                <input type="text" id="riskResponseDescription" placeholder="e.g., Implement agile practices to control scope">
+            </div>
+            <button class="button-action" onclick="addRisk()">Add Risk</button>
+        </div>
 
-        <label for="riskType">Risk Type:</label>
-        <select id="riskType">
-            <option value="Technical">Technical</option>
-            <option value="Operational">Operational</option>
-            <option value="Security">Security</option>
-            <option value="Scope">Scope</option>
-            <option value="Management">Management</option>
-        </select><br>
 
-        <label for="likelihood">Likelihood (1-5):</label>
-        <input type="number" id="likelihood" min="1" max="5" value="3"><br>
-
-        <label for="impact">Impact (1-5):</label>
-        <input type="number" id="impact" min="1" max="5" value="3"><br>
-
-        <label for="minCost">Minimum Cost if Occurs (€):</label>
-        <input type="number" id="minCost" value="5000"><br>
-
-        <label for="costPercentage">Cost as % of Budget:</label>
-        <input type="number" id="costPercentage" value="5"><br>
-
-        <!-- New Field: Risk Response Description -->
-        <label for="riskResponseDescription">Risk Response Description:</label>
-        <input type="text" id="riskResponseDescription" placeholder="e.g., Implement agile practices to control scope"><br>
-
-        <button class="button-action" onclick="addRisk()">Add Risk</button>
-
-        <h2>Risk Register</h2>
+        <h2 style="text-align: center;">Risk Register</h2>
         <!-- Button Container for Alignment -->
         <div style="display: flex; justify-content: space-between; margin-top: 10px;">
             <button class="button-action" onclick="proceedToSimulation()">Proceed to Simulation</button>
@@ -97,8 +125,12 @@
             </tr>
         </table>
     </div>
+</div>
 
-    <div id="simulation" class="hidden">
+<div class="container">
+    <div id="simulation" class="hidden" >
+        <!-- Add this button near the top of your simulation section -->
+    <button id="simulationBackButton" class="btn"><i class="fa-solid fa-chevron-left"></i></button>
         <h2>Simulation</h2>
         <p id="simulationInfo"></p>
 
@@ -147,15 +179,18 @@
     </div>
 
     <div id="gameStatus"></div>
+</div>
 
+<div class="container">
     <!-- Final Project Result Section -->
-    <div id="finalResult" class="hidden">
+    <div id="finalResult" class="hidden" >
         <h2>Simulation Results</h2>
         <div id="finalProjectInfo"></div>
         <h3>Your Overall Score</h3>
         <p id="finalScore"></p>
         <button class="button-action" onclick="window.print()">Print Results</button>
     </div>
+</div>
 
     <!-- Help Modal -->
     <div id="helpModal" class="modal">
@@ -244,6 +279,8 @@
     </div>
 
     <!-- JavaScript Code -->
-    
+   
+    <script nonce="random123" type="text/javascript" src="main.js"></script>
+   
 </body>
 </html>

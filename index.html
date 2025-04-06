@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <!-- Include Chart.js from CDN -->
     <script nonce="random123" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script nonce="random123" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -22,15 +24,16 @@
 </head>
 <body>
     <div class="container">
+    <div class="container1">
         <div class="header">
         <!-- Help Button -->
        <button id="helpButton">Help</button>
        
         <!-- Logo Image -->
         <!-- <img src="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg" alt="VAMK Logo" class="logo" style="max-width: 200px; margin: auto; justify-content: center;align-items: center;display: flex; padding-bottom: 20px; "> -->
-        <img src="assets/favicon.png" alt="header" style="text-align: center; max-width: 550px; margin: auto; justify-content: center;align-items: center;display: flex; padding-bottom: 20px;">
+        <img src="assets/favicon.png" alt="header" id="header-img">
     <!-- <h1 class="game-title" style="text-align: center;">Risk Simulation Game for Software Engineering</h1> -->
-    <p  class="game-description" style="text-align: center;">In this interactive simulation, you take on the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks. Your strategic decisions will determine the project's outcome.</p><br>
+    <p  class="game-description">In this interactive simulation, you take on the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks. Your strategic decisions will determine the project's outcome.</p><br>
     </div>
     
     <!-- Project Setup -->
@@ -60,7 +63,7 @@
 </div>
 
     <!-- Game and Simulation Sections -->
-     <div class="container">
+     <div class="container1">
        
     <div id="game"  class="hidden" >
         <!-- Add this button near the top of your game section -->
@@ -127,7 +130,7 @@
     </div>
 </div>
 
-<div class="container">
+<div class="container1">
     <div id="simulation" class="hidden" >
         <!-- Add this button near the top of your simulation section -->
     <button id="simulationBackButton" class="btn"><i class="fa-solid fa-chevron-left"></i></button>
@@ -181,7 +184,7 @@
     <div id="gameStatus"></div>
 </div>
 
-<div class="container">
+<div class="container1">
     <!-- Final Project Result Section -->
     <div id="finalResult" class="hidden" >
         <h2>Simulation Results</h2>
@@ -190,6 +193,7 @@
         <p id="finalScore"></p>
         <button class="button-action" onclick="window.print()">Print Results</button>
     </div>
+</div>
 </div>
 
     <!-- Help Modal -->

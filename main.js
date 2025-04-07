@@ -10,14 +10,13 @@ var turnLabels = [];
 var budgetChart;
 var qualityChart;
 var startGameButton;
-var gameInProgress = false; // Flag to track if game is in progress
+var gameInProgress = false; 
 
 window.onload = function() {
     setDefaultProjectName();
     addRiskResponseListener();
     updateBaselineCost();
     setupHelpModal();
-    // Add event listeners for all back buttons
     setupBackButtons();
     const divsToHide = ['simulation', 'finalResult', 'game'];
     
@@ -28,7 +27,7 @@ window.onload = function() {
       }
     });
 
-    // Add this at the very end of your window.onload function
+   
 setTimeout(function() {
     console.log("Forcibly hiding divs");
     const divsToHide = ['simulation', 'finalResult', 'game'];
@@ -42,30 +41,30 @@ setTimeout(function() {
             console.log("Div not found:", divId);
         }
     });
-}, 1000); // Delay by 1 second to ensure it runs after other scripts
+}, 1000); 
 };
 
-// New function to set up back button event listeners
+
 function setupBackButtons() {
-    // Back button from game to setup
+    
     document.getElementById('gameBackButton').addEventListener('click', function() {
-        // Only allow going back if the game is not in progress
+        
         if (!gameInProgress) {
             document.getElementById('game').classList.add('hidden');
             document.getElementById('setup').classList.remove('hidden');
         }
     });
     
-    // Back button from simulation to game
+    
     document.getElementById('simulationBackButton').addEventListener('click', function() {
-        // Only allow going back if the game is not in progress
+       
         if (!gameInProgress) {
             document.getElementById('simulation').classList.add('hidden');
             document.getElementById('game').classList.remove('hidden');
         }
     });
     
-    // Back button from final result to setup (restart game)
+    
     document.getElementById('finalResultBackButton').addEventListener('click', function() {
         document.getElementById('finalResult').classList.add('hidden');
         document.getElementById('setup').classList.remove('hidden');
@@ -150,17 +149,14 @@ function updateBaselineCost() {
 
 
 document.addEventListener("DOMContentLoaded", function() {
-    startGameButton = document.getElementById("startGameButton");  // Assign button
+    startGameButton = document.getElementById("startGameButton");  
     if (startGameButton) {
         startGameButton.addEventListener("click", startGame);
         console.log("Start Game button found and event listener added.");
     } else {
         console.log("⚠️ Error: Start Game button NOT found!");
     }
-    // startGameButton.disabled = true; // Disable the button
-    // console.log("Button disabled status:", startGameButton.disabled);
-
-    // console.log("Game should start now");
+    
 });
 
 
@@ -329,8 +325,7 @@ function addRisk() {
             console.log("Swal modal closed");
         });
         return;
-        // alert("Please enter a risk name.");
-        // return;
+       
     }
 
     if (riskResponseDescription.trim() === "") {
@@ -343,8 +338,7 @@ function addRisk() {
             console.log("Swal modal closed");
         });
         return;
-        // alert("Please enter a risk response description.");
-        // return;
+        
     }
 
     var riskScore = likelihood * impact;
@@ -432,8 +426,7 @@ function proceedToSimulation() {
             console.log("Swal modal closed");
         });
         return;
-        // alert("Please add at least 5 risks before proceeding.");
-        // return;
+        
     }
     document.getElementById('game').classList.add('hidden');
     document.getElementById('simulation').classList.remove('hidden');
@@ -462,14 +455,16 @@ function nextTurn() {
     if (riskEvent) {
         document.getElementById('riskEvent').classList.remove('hidden');
         document.getElementById('riskEventDescription').innerHTML = `
-            <p>Risk "<strong>${riskEvent.name}</strong>" has occurred!</p>
-            <p>Type: ${riskEvent.type}</p>
-            <p>Likelihood: ${riskEvent.likelihood}</p>
-            <p>Impact: ${riskEvent.impact}</p>
-            <p>Minimum Cost if Occurs: €${riskEvent.minCost.toLocaleString()}</p>
-            <p>Cost as % of Budget: ${riskEvent.costPercentage}%</p>
-            <p>Risk Response Description: ${riskEvent.responseDescription}</p>
-        `;
+        
+    <div class="status-line"><span class="label">Risk:</span><span class="value"><strong>${riskEvent.name}</strong> has occurred!</span></div>
+    <div class="status-line"><span class="label">Type:</span><span class="value">${riskEvent.type}</span></div>
+    <div class="status-line"><span class="label">Likelihood:</span><span class="value">${riskEvent.likelihood}</span></div>
+    <div class="status-line"><span class="label">Impact:</span><span class="value">${riskEvent.impact}</span></div>
+    <div class="status-line"><span class="label">Min Cost if Occurs:</span><span class="value">€${riskEvent.minCost.toLocaleString()}</span></div>
+    <div class="status-line"><span class="label">Cost as % of Budget:</span><span class="value">${riskEvent.costPercentage}%</span></div>
+    <div class="status-line"><span class="label">Response:</span><span class="value">${riskEvent.responseDescription}</span></div>
+`;
+
         document.getElementById('nextTurnButton').disabled = true;
         currentRiskEvent = riskEvent;
     } else {
@@ -508,8 +503,7 @@ function respondToRisk() {
             console.log("Swal modal closed");
         });
         return;
-        // alert("Please select a risk response action.");
-        // return;
+        
     }
 
     var costFromMin = currentRiskEvent.minCost;
@@ -576,13 +570,14 @@ function updateProjectStatus() {
     timeRemaining = timeRemaining.toFixed(1);
 
     var status = `
-        <p>Turn: ${currentTurn} / ${project.originalDuration}</p>
-        <p>Budget Remaining: €${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-        <p>Risk Contingency Remaining: €${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-        <p>Time Remaining: ${timeRemaining} months</p>
-        <p>Quality: ${project.quality}%</p>
-    `;
-    document.getElementById('projectStatus').innerHTML = status;
+    <div class="status-line"><span class="label">Turn:</span><span class="value">${currentTurn} / ${project.originalDuration}</span></div>
+    <div class="status-line"><span class="label">Budget Remaining:</span><span class="value">€${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
+    <div class="status-line"><span class="label">Risk Contingency Remaining:</span><span class="value">€${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
+    <div class="status-line"><span class="label">Time Remaining:</span><span class="value">${timeRemaining} months</span></div>
+    <div class="status-line"><span class="label">Quality:</span><span class="value">${project.quality}%</span></div>
+`;
+document.getElementById('projectStatus').innerHTML = status;
+
 
     if (project.budget <= 0 || project.quality <= 0) {
         gameOver = true;
@@ -643,14 +638,27 @@ function finalizeGame(isSuccess) {
     }
 
     document.getElementById('finalResult').innerHTML = `
-        <h2>Simulation Results</h2>
-        ${finalInfo}
-        <h3>Your Overall Score</h3>
-        <p><strong>${finalScore}%</strong></p>
-        ${message}
+    <h2 class="center-text">Simulation Results</h2>
+    <div class="table-container">
+ ${finalInfo}
+    </div>
+
+    <h3 class="center-text">Your Overall Score</h3>
+    <div class="table-container">
+        <div class="table-row">
+            
+            <div class="table-cell value">${finalScore}%</div>
+        </div>
+    </div>
+
+    <div class="center-text message">${message}</div>
+
+    <div class="center-text">
         <button class="button-action" onclick="window.print()">Print Results</button>
-        <button id="finalResultBackButton" class="button-secondary">New Game</button>
-    `;
+        <button id="finalResultBackButton" class="button-action">New Game</button>
+    </div>
+`;
+
     document.getElementById('finalResult').classList.remove('hidden');
     
     // Add event listener for the back button in the final result section
@@ -777,8 +785,7 @@ function exportRiskRegister() {
             console.log("Swal modal closed");
         });
         return;
-        // alert("No risks to export.");
-        // return;
+       
     }
 
     var ws_data = [

@@ -66,6 +66,9 @@ body {
      
 
 }
+h2, h3{
+    text-align:center;
+}
 #header-img{
     text-align: center; 
     max-width: 550px; 
@@ -74,15 +77,14 @@ body {
     align-items: center;
     display: flex; 
     padding-bottom: 20px;
+    margin-left:130px
 }
 .btn{
-   
-    font-size: 40px; 
+    font-size: 30px; 
     cursor: pointer; 
     border: none;
     background: transparent; 
     padding: 0;
-
 }
 
 #setup {
@@ -140,6 +142,7 @@ body {
 .riskResponse select{
     border:none;
     border-bottom: 2px solid  rgba(0, 0, 0, 0.1);
+    background-color: #e9e9e9;
 }
 .button-action {
     margin-top: 10px;
@@ -166,12 +169,41 @@ th, td {
 th {
     background-color: #f2f2f2;
 }
+
 #result {
     margin-top: 20px;
 }
 #gameStatus {
-    margin-top: 20px;
+    text-align:left;
+}
+#projectStatus {
     text-align: center;
+    margin: 20px auto;
+    max-width: 500px;
+    
+}
+
+.status-line {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+    
+}
+
+.label {
+    font-weight: bold;
+    flex: 1;
+    text-align: right;
+    padding-right: 10px;
+}
+
+.value {
+    flex: 1;
+    text-align: left;
+}
+
+#riskEventDescription{
+    text-align:center;
 }
 .game-description{
     text-align: center; 
@@ -179,9 +211,10 @@ th {
     font-optical-sizing: auto;
     font-weight:400; 
     font-style:normal;
-    padding: 20px;
+    padding: 10px;
     width:600px;
     margin: auto;
+    
 }
 .hidden {
   display: none !important;
@@ -216,6 +249,14 @@ th {
     height: 20px;
     border-radius: 10px;
 }
+#simulationInfo{
+    text-align:center;
+}
+#nextTurnButton{
+    display: flex;
+  align-items: center;
+  justify-content: center;
+}
 #charts {
     display: flex;
     flex-wrap: wrap;
@@ -227,6 +268,7 @@ th {
 }
 #responseExplanation {
     margin-top: 10px;
+    
 }
 .progress-label {
     width: 200px;
@@ -254,8 +296,53 @@ th {
 .right-align {
     text-align: right;
 }
+/* Center all text */
+.center-text {
+    text-align: center;
+}
+
+/* Table-like structure for labels and values */
+.table-container {
+    display: table;
+    margin: 0 auto;
+    text-align: center;
+    padding: 10px;
+    width: 100%;
+}
+
+/* Center the content of each row */
+.table-row {
+    display: table-row;
+    text-align: center; /* Center the row content */
+}
+
+/* Ensure both columns align centrally */
+.table-cell {
+    display: table-cell;
+    padding: 5px 10px;
+    text-align: center; /* Center the content inside the cells */
+}
+
+/* Style for label cells */
+.table-cell.label {
+    font-weight: bold;
+    text-align: center; /* Center the label in its cell */
+    width: 150px;  /* Adjust width to ensure alignment */
+}
+
+/* Style for value cells */
+.table-cell.value {
+    text-align: center; /* Center the value in its cell */
+}
+
+/* Additional margin for message text */
+.message {
+    margin-top: 15px;
+}
+
+
 #finalResult {
-    text-align: left;
+    /* text-align: center; */
 }
 #finalResult img {
     max-width: 20%;
@@ -265,9 +352,8 @@ th {
     display: inline-block;
 }
 #helpButton {
-    //position: fixed;
+   float: right;
     top: 50px;
-    right: 20px;
     background-color: #008CBA;
     color: white;
     border: none;

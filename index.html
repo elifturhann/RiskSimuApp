@@ -33,12 +33,13 @@
         <!-- <img src="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg" alt="VAMK Logo" class="logo" style="max-width: 200px; margin: auto; justify-content: center;align-items: center;display: flex; padding-bottom: 20px; "> -->
         <img src="assets/favicon.png" alt="header" id="header-img">
     <!-- <h1 class="game-title" style="text-align: center;">Risk Simulation Game for Software Engineering</h1> -->
-    <p  class="game-description">In this interactive simulation, you take on the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks. Your strategic decisions will determine the project's outcome.</p><br>
+    
     </div>
     
     <!-- Project Setup -->
     <div id="setup">
       <div class="form-group">
+        <p  class="game-description">In this interactive simulation, you take on the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks. Your strategic decisions will determine the project's outcome.</p><br>
         <h2 style="text-align: center;">Project Setup</h2>
         <label for="projectName">Project Name:</label>
         <input type="text" id="projectName"><br>
@@ -132,29 +133,30 @@
 
 <div class="container1">
     <div id="simulation" class="hidden" >
-        <!-- Add this button near the top of your simulation section -->
     <button id="simulationBackButton" class="btn"><i class="fa-solid fa-chevron-left"></i></button>
-        <h2>Simulation</h2>
+        <h2 style="text-align: center;">Simulation</h2>
         <p id="simulationInfo"></p>
 
-        <div id="riskEvent" class="hidden">
-            <h3>Risk Event Occurred!</h3>
+        <div id="riskEvent" class="hidden"><br>
+            <h3 style="text-align: center;">Risk Event Occurred!</h3>
+            
             <div id="riskEventDescription"></div>
-            <label for="riskResponse">Choose Your Response:</label>
-            <select id="riskResponse">
+            <label for="riskResponse"style=" margin-left:30%; font-weight:bold">Choose Your Response:</label>
+            <select id="riskResponse" >
                 <option value="">--Select an Action--</option>
                 <option value="Mitigate">Mitigate</option>
                 <option value="Avoid">Avoid</option>
                 <option value="Transfer">Transfer</option>
                 <option value="Accept">Accept</option>
             </select><br>
-            <div id="responseExplanation"></div>
+       
+            <div id="responseExplanation" style=" margin-left:35%;"></div>
             <button class="button-action" onclick="respondToRisk()">Respond</button>
         </div>
-
         <button id="nextTurnButton" class="button-action" onclick="nextTurn()">Next Turn</button>
 
-        <h2>Project Status</h2>
+
+        <h2 style="text-align: center;">Project Status</h2>
         <div class="progress-bar">
             <span class="progress-label">Budget Remaining:</span>
             <div class="progress-container">
@@ -180,16 +182,17 @@
             <canvas id="qualityChart" width="400" height="200"></canvas>
         </div>
     </div>
-
+    
     <div id="gameStatus"></div>
+
 </div>
 
 <div class="container1">
     <!-- Final Project Result Section -->
     <div id="finalResult" class="hidden" >
-        <h2>Simulation Results</h2>
+        <h2>Simulation Results</h2><br>
         <div id="finalProjectInfo"></div>
-        <h3>Your Overall Score</h3>
+        <h3>Your Overall Score: </h3>
         <p id="finalScore"></p>
         <button class="button-action" onclick="window.print()">Print Results</button>
     </div>

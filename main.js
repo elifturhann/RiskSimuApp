@@ -2,112 +2,20 @@ var project = {};
 var risks = [];
 var currentTurn = 0;
 var gameOver = false;
-
 var budgetData = [];
 var qualityData = [];
 var turnLabels = [];
-
-var budgetChart;
-var qualityChart;
-var startGameButton;
-var gameInProgress = false; 
+var currentRiskEvent = null;
+var performanceLog = [];
+var budgetChartInstance = null;
+var qualityChartInstance = null;
 
 window.onload = function() {
     setDefaultProjectName();
     addRiskResponseListener();
     updateBaselineCost();
     setupHelpModal();
-    setupBackButtons();
-    const divsToHide = ['simulation', 'finalResult', 'game'];
-    
-    divsToHide.forEach(function(divId) {
-      const div = document.getElementById(divId);
-      if (div) {
-        div.style.display = 'none';
-      }
-    });
-
-   
-setTimeout(function() {
-    console.log("Forcibly hiding divs");
-    const divsToHide = ['simulation', 'finalResult', 'game'];
-    
-    divsToHide.forEach(function(divId) {
-        const div = document.getElementById(divId);
-        if (div) {
-            console.log("Hiding div:", divId);
-            div.style.display = 'none';
-        } else {
-            console.log("Div not found:", divId);
-        }
-    });
-}, 1000); 
 };
-
-
-function setupBackButtons() {
-    
-    document.getElementById('gameBackButton').addEventListener('click', function() {
-        
-        if (!gameInProgress) {
-            document.getElementById('game').classList.add('hidden');
-            document.getElementById('setup').classList.remove('hidden');
-        }
-    });
-    
-    
-    document.getElementById('simulationBackButton').addEventListener('click', function() {
-       
-        if (!gameInProgress) {
-            document.getElementById('simulation').classList.add('hidden');
-            document.getElementById('game').classList.remove('hidden');
-        }
-    });
-    
-    
-    document.getElementById('finalResultBackButton').addEventListener('click', function() {
-        document.getElementById('finalResult').classList.add('hidden');
-        document.getElementById('setup').classList.remove('hidden');
-        resetGame();
-    });
-}
-
-// New function to toggle back button state
-function toggleBackButtons(enabled) {
-    document.getElementById('gameBackButton').disabled = !enabled;
-    document.getElementById('simulationBackButton').disabled = !enabled;
-    
-    // Update the visual appearance based on state
-    if (enabled) {
-        document.getElementById('gameBackButton').classList.remove('button-disabled');
-        document.getElementById('simulationBackButton').classList.remove('button-disabled');
-    } else {
-        document.getElementById('gameBackButton').classList.add('button-disabled');
-        document.getElementById('simulationBackButton').classList.add('button-disabled');
-    }
-}
-
-// New function to reset the game state
-function resetGame() {
-    project = {};
-    risks = [];
-    currentTurn = 0;
-    gameOver = false;
-    gameInProgress = false;
-    budgetData = [];
-    qualityData = [];
-    turnLabels = [];
-    
-    // Enable back buttons
-    toggleBackButtons(true);
-    
-    // Reset form values
-    setDefaultProjectName();
-    document.getElementById('projectBudget').value = '';
-    document.getElementById('projectDuration').value = '';
-    document.getElementById('baselineCost').value = '';
-    document.getElementById('riskContingencyPercentage').value = '10';
-}
 
 function setDefaultProjectName() {
     var projectNames = ["Turing", "Ada", "Grace", "Linus", "Jobs", "Gates", "Von Neumann", "Tesla", "Dijkstra", "Knuth"];
@@ -115,8 +23,7 @@ function setDefaultProjectName() {
     var currentDate = new Date();
     var dateString = formatDate(currentDate);
     var timeString = formatTime(currentDate);
-    var defaultProjectName = randomName + " " + dateString + " " + timeString;
-    document.getElementById('projectName').value = defaultProjectName;
+    document.getElementById('projectName').value = randomName + " " + dateString + " " + timeString;
 }
 
 function formatDate(date) {
@@ -134,162 +41,118 @@ function formatTime(date) {
 }
 
 function updateBaselineCost() {
-    // Convert project budget from €k to €
     var projectBudget = parseFloat(document.getElementById('projectBudget').value) * 1000;
     var projectDuration = parseInt(document.getElementById('projectDuration').value);
     if (isNaN(projectBudget) || isNaN(projectDuration) || projectDuration === 0) {
         document.getElementById('baselineCost').value = "";
         return;
     }
-    // Calculate baseline cost per turn then convert back to €k for display
     var baselineCostPerTurn = (projectBudget / projectDuration) - (0.01 * projectBudget);
-    baselineCostPerTurn = baselineCostPerTurn / 1000;
-    document.getElementById('baselineCost').value = baselineCostPerTurn.toFixed(2);
+    document.getElementById('baselineCost').value = (baselineCostPerTurn / 1000).toFixed(2);
 }
 
+function startGame() {
+    let projectNameInput = document.getElementById('projectName');
+    let projectBudget = document.getElementById('projectBudget');
+    let projectDuration = document.getElementById('projectDuration');
+    let baselineCostPerTurn = document.getElementById('baselineCost');
+    let riskContingencyPercentage = document.getElementById('riskContingencyPercentage');
 
-document.addEventListener("DOMContentLoaded", function() {
-    startGameButton = document.getElementById("startGameButton");  
-    if (startGameButton) {
-        startGameButton.addEventListener("click", startGame);
-        console.log("Start Game button found and event listener added.");
-    } else {
-        console.log("⚠️ Error: Start Game button NOT found!");
-    }
-    
-});
+    let projectNameValue = projectNameInput.value.trim().toLowerCase();
+    let projectBudgetValue = parseFloat(projectBudget.value) * 1000;
+    let projectDurationValue = parseInt(projectDuration.value);
+    let baselineCostPerTurnValue = parseFloat(baselineCostPerTurn.value) * 1000;
+    let riskContingencyPercentageValue = parseFloat(riskContingencyPercentage.value);
 
-
-function startGame(event) {
-    event.preventDefault();
-    console.log("Start game function triggered");
-
-    if (startGameButton) {
-        console.log("Button disabled status:", startGameButton.disabled);
-    } else {
-        console.log("startGameButton is not defined");
-    }
-
-    var projectNameInput = document.getElementById('projectName').value;
-    var projectBudget = parseFloat(document.getElementById('projectBudget').value) * 1000;
-    var projectDuration = parseInt(document.getElementById('projectDuration').value);
-    var baselineCostPerTurn = parseFloat(document.getElementById('baselineCost').value) * 1000;
-    var riskContingencyPercentage = parseFloat(document.getElementById('riskContingencyPercentage').value);
-
-    if (projectNameInput === "") {
-        console.log("Project name is empty, showing Swal");
+    if (projectNameValue === "") {
         Swal.fire({
-            title: 'Error!',
+            icon: 'error',
+            title: 'Oops...,Error',
             text: 'Please enter a project name.',
-            icon: 'error',
-            confirmButtonText: 'Cool'
-        }).then(() => {
-            console.log("Swal modal closed");
         });
         return;
     }
-
-    if (isNaN(baselineCostPerTurn) || baselineCostPerTurn <= 0) {
-        console.log("Invalid Baseline Cost per Turn, showing Swal");
+    if (isNaN(projectBudgetValue) || projectBudgetValue <= 0) {
         Swal.fire({
-            title: 'Error!',
-            text: 'Invalid Baseline Cost per Turn. Please check your Project budget and duration.',
             icon: 'error',
-            confirmButtonText: 'Cool'
-        }).then(() => {
-            console.log("Swal modal closed");
+            title: 'Invalid Input',
+            text: 'Invalid Project Budget. Please enter a positive number.',
+        });
+        return;
+    }
+    if (isNaN(projectDurationValue) || projectDurationValue <= 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Input',
+            text: 'Invalid Project Duration. Please enter a positive integer.',
+        });
+        return;
+    }
+    if (isNaN(baselineCostPerTurnValue) || baselineCostPerTurnValue <= 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Input',
+            text: 'Invalid Baseline Cost per Turn. Please enter a positive number.',
+        });
+        return;
+    }
+    if (isNaN(riskContingencyPercentageValue) || riskContingencyPercentageValue < 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Input',
+            text: 'Invalid Risk Contingency Percentage. Please enter a non-negative number.',
         });
         return;
     }
 
-    console.log("Game should start now");
-    console.log("Button disabled status:", startGameButton.disabled);
-
-
-    // Cheat function activation (if project name is "risk")
-    if (projectNameInput.trim().toLowerCase() === "risk") {
-        var currentDate = new Date();
-        var dateString = formatDate(currentDate);
-        var timeString = formatTime(currentDate);
-        projectNameInput += " " + dateString + " " + timeString;
-        generateCheatRisks();
+    if (projectNameValue === "tv" || projectNameValue === "risk") {
+        let currentDate = new Date();
+        let dateString = formatDate(currentDate);
+        let timeString = formatTime(currentDate);
+        projectNameValue = "Demo " + dateString + " " + timeString;
+        if (risks.length === 0) {
+            generateCheatRisks();
+        }
     }
 
-    var riskContingencyBudget = (riskContingencyPercentage / 100) * projectBudget;
+    var riskContingencyBudget = (riskContingencyPercentageValue / 100) * projectBudgetValue;
 
     project = {
-        name: projectNameInput,
-        budget: projectBudget,
-        originalBudget: projectBudget,
+        name: projectNameValue,
+        budget: projectBudgetValue,
+        originalBudget: projectBudgetValue,
         riskContingencyBudget: riskContingencyBudget,
         originalRiskContingencyBudget: riskContingencyBudget,
-        baselineCostPerTurn: baselineCostPerTurn,
-        duration: projectDuration,
-        originalDuration: projectDuration,
+        baselineCostPerTurn: baselineCostPerTurnValue,
+        duration: projectDurationValue,
+        originalDuration: projectDurationValue,
         quality: 100
     };
 
-    
     document.getElementById('setup').classList.add('hidden');
     document.getElementById('game').classList.remove('hidden');
+    document.getElementById('gameBackButton').disabled = false;
+    document.getElementById('gameBackButton').style.display = 'inline-block';
     updateRiskTable();
+    if (risks.length >= 3) {
+        document.getElementById('exportButton').classList.remove('hidden');
+    }
 }
 
-// Move these functions outside of startGame
 function generateCheatRisks() {
+    risks = [];
     var cheatRisks = [
-        {
-            name: "Requirement Creep",
-            type: "Scope",
-            likelihood: 4,
-            impact: 3,
-            minCost: 5000,
-            costPercentage: 5,
-            responseDescription: "Implement agile practices and regular backlog reviews to control scope."
-        },
-        {
-            name: "Technical Debt Accumulation",
-            type: "Technical",
-            likelihood: 3,
-            impact: 4,
-            minCost: 4000,
-            costPercentage: 4,
-            responseDescription: "Plan refactoring cycles and enforce code reviews to reduce technical debt."
-        },
-        {
-            name: "Integration Issues",
-            type: "Technical",
-            likelihood: 3,
-            impact: 3,
-            minCost: 3000,
-            costPercentage: 3,
-            responseDescription: "Conduct early prototyping and thorough integration testing."
-        },
-        {
-            name: "Security Vulnerability",
-            type: "Security",
-            likelihood: 2,
-            impact: 5,
-            minCost: 6000,
-            costPercentage: 6,
-            responseDescription: "Perform regular security audits and implement robust security measures."
-        },
-        {
-            name: "Team Turnover",
-            type: "Operational",
-            likelihood: 4,
-            impact: 2,
-            minCost: 2000,
-            costPercentage: 2,
-            responseDescription: "Enhance team retention through competitive incentives and a positive culture."
-        }
+        { name: "Requirement Creep", type: "Scope", likelihood: 4, impact: 3, minCost: 5000, costPercentage: 5, responseDescription: "Implement agile practices." },
+        { name: "Technical Debt", type: "Technical", likelihood: 3, impact: 4, minCost: 4000, costPercentage: 4, responseDescription: "Plan refactoring cycles." },
+        { name: "Integration Issues", type: "Technical", likelihood: 3, impact: 3, minCost: 3000, costPercentage: 3, responseDescription: "Conduct early testing." },
+        { name: "Security Breach", type: "Security", likelihood: 2, impact: 5, minCost: 6000, costPercentage: 6, responseDescription: "Perform security audits." },
+        { name: "Team Turnover", type: "Operational", likelihood: 4, impact: 2, minCost: 2000, costPercentage: 2, responseDescription: "Enhance team culture." }
     ];
 
     cheatRisks.forEach(function(riskData) {
         var riskScore = riskData.likelihood * riskData.impact;
         var riskLevel = getRiskLevel(riskScore);
-
-        var risk = {
+        risks.push({
             name: riskData.name,
             type: riskData.type,
             likelihood: riskData.likelihood,
@@ -300,13 +163,20 @@ function generateCheatRisks() {
             level: riskLevel,
             occurred: false,
             responseDescription: riskData.responseDescription
-        };
-
-        risks.push(risk);
+        });
     });
 }
 
 function addRisk() {
+    if (risks.length >= 5) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Limit Reached',
+            text: 'Maximum of 5 risks reached!',
+        });
+        return;
+    }
+
     var riskName = document.getElementById('riskName').value;
     var riskType = document.getElementById('riskType').value;
     var likelihood = parseInt(document.getElementById('likelihood').value);
@@ -317,34 +187,24 @@ function addRisk() {
 
     if (riskName === "") {
         Swal.fire({
-            title: 'Error!',
-            text: 'Please enter a risk name.',
             icon: 'error',
-            confirmButtonText: 'Cool'
-        }).then(() => {
-            console.log("Swal modal closed");
+            title: 'Missing Input',
+            text: 'Please enter a risk name.',
         });
         return;
-       
     }
-
     if (riskResponseDescription.trim() === "") {
         Swal.fire({
-            title: 'Error!',
-            text: 'Please enter a risk response description.',
             icon: 'error',
-            confirmButtonText: 'Cool'
-        }).then(() => {
-            console.log("Swal modal closed");
+            title: 'Missing Input',
+            text: 'Please enter a risk response description.',
         });
         return;
-        
     }
 
     var riskScore = likelihood * impact;
     var riskLevel = getRiskLevel(riskScore);
-
-    var risk = {
+    risks.push({
         name: riskName,
         type: riskType,
         likelihood: likelihood,
@@ -355,14 +215,25 @@ function addRisk() {
         level: riskLevel,
         occurred: false,
         responseDescription: riskResponseDescription
-    };
+    });
 
-    risks.push(risk);
     updateRiskTable();
     document.getElementById('riskName').value = "";
     document.getElementById('minCost').value = "5000";
     document.getElementById('costPercentage').value = "5";
     document.getElementById('riskResponseDescription').value = "";
+
+    if (risks.length >= 3) {
+        document.getElementById('exportButton').classList.remove('hidden');
+    }
+}
+
+function removeRisk(index) {
+    risks.splice(index, 1);
+    updateRiskTable();
+    if (risks.length < 3) {
+        document.getElementById('exportButton').classList.add('hidden');
+    }
 }
 
 function getRiskLevel(score) {
@@ -381,27 +252,28 @@ function updateRiskTable() {
             <th>Likelihood</th>
             <th>Impact</th>
             <th>Min Cost (€)</th>
-            <th>Cost (% of Budget)</th>
+            <th>Cost (%)</th>
             <th>Risk Score</th>
             <th>Risk Level</th>
-            <th>Risk Response Description</th>
+            <th>Risk Response</th>
+            <th>Action</th>
         </tr>
     `;
-
-    risks.forEach(function(risk) {
+    risks.forEach(function(risk, index) {
         var row = table.insertRow();
+        var riskLevelClass = getRiskLevelClass(risk.level);
         row.innerHTML = `
             <td class="left-align">${risk.name}</td>
             <td>${risk.type}</td>
             <td>${risk.likelihood}</td>
             <td>${risk.impact}</td>
             <td class="right-align">${risk.minCost.toLocaleString()}</td>
-            <td>${risk.costPercentage}%</td>
+            <td class="right-align">${risk.costPercentage}%</td>
             <td>${risk.score}</td>
-            <td>${risk.level}</td>
+            <td class="${riskLevelClass}">${risk.level}</td>
             <td class="left-align">${risk.responseDescription}</td>
+            <td><button class="remove-button" onclick="removeRisk(${index})">Remove</button></td>
         `;
-        row.classList.add(getRiskLevelClass(risk.level));
     });
 }
 
@@ -416,17 +288,13 @@ function getRiskLevelClass(level) {
 }
 
 function proceedToSimulation() {
-    if (risks.length < 5) {
+    if (risks.length !== 5) {
         Swal.fire({
-            title: 'Error!',
-            text: 'Please add at least 5 risks before proceeding.',
-            icon: 'error',
-            confirmButtonText: 'Cool'
-        }).then(() => {
-            console.log("Swal modal closed");
+            icon: 'warning',
+            title: 'Incomplete Risks',
+            text: 'Please add exactly 5 risks before proceeding.',
         });
         return;
-        
     }
     document.getElementById('game').classList.add('hidden');
     document.getElementById('simulation').classList.remove('hidden');
@@ -435,36 +303,61 @@ function proceedToSimulation() {
     initializeCharts();
 }
 
+
+function exportRiskRegisterToExcel() {
+    if (risks.length === 0) {
+        Swal.fire({
+            icon: 'info',
+            title: 'No Data',
+            text: 'No risks to export.',
+        });
+        return;
+    }
+    const ws_data = [
+        ["Risk Name", "Type", "Likelihood", "Impact", "Min Cost (€)", "Cost (% of Budget)", "Risk Score", "Risk Level", "Risk Response Description"]
+    ];
+    risks.forEach(risk => {
+        ws_data.push([
+            risk.name,
+            risk.type,
+            risk.likelihood,
+            risk.impact,
+            risk.minCost,
+            `${risk.costPercentage}%`,
+            risk.score,
+            risk.level,
+            risk.responseDescription
+        ]);
+    });
+
+    // Create a workbook and add the worksheet
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Risk Register");
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    XLSX.writeFile(wb, `risk_register_${timestamp}.xlsx`);
+}
+
 function nextTurn() {
     if (gameOver) return;
-    
-    // Set the game in progress flag
-    gameInProgress = true;
-    
-    // Disable back buttons once gameplay begins
-    toggleBackButtons(false);
-
     currentTurn++;
     if (currentTurn > project.duration) {
         checkWinCondition();
         return;
     }
-
     project.budget -= project.baselineCostPerTurn;
     var riskEvent = checkForRiskEvent();
     if (riskEvent) {
         document.getElementById('riskEvent').classList.remove('hidden');
         document.getElementById('riskEventDescription').innerHTML = `
-        
-    <div class="status-line"><span class="label">Risk:</span><span class="value"><strong>${riskEvent.name}</strong> has occurred!</span></div>
-    <div class="status-line"><span class="label">Type:</span><span class="value">${riskEvent.type}</span></div>
-    <div class="status-line"><span class="label">Likelihood:</span><span class="value">${riskEvent.likelihood}</span></div>
-    <div class="status-line"><span class="label">Impact:</span><span class="value">${riskEvent.impact}</span></div>
-    <div class="status-line"><span class="label">Min Cost if Occurs:</span><span class="value">€${riskEvent.minCost.toLocaleString()}</span></div>
-    <div class="status-line"><span class="label">Cost as % of Budget:</span><span class="value">${riskEvent.costPercentage}%</span></div>
-    <div class="status-line"><span class="label">Response:</span><span class="value">${riskEvent.responseDescription}</span></div>
-`;
-
+            <p>Risk "<strong>${riskEvent.name}</strong>" has occurred!</p>
+            <p>Type: ${riskEvent.type}</p>
+            <p>Likelihood: ${riskEvent.likelihood}</p>
+            <p>Impact: ${riskEvent.impact}</p>
+            <p>Minimum Cost: €${riskEvent.minCost.toLocaleString()}</p>
+            <p>Cost as % of Budget: ${riskEvent.costPercentage}%</p>
+            <p>Risk Response: ${riskEvent.responseDescription}</p>
+        `;
         document.getElementById('nextTurnButton').disabled = true;
         currentRiskEvent = riskEvent;
     } else {
@@ -473,8 +366,6 @@ function nextTurn() {
         checkWinCondition();
     }
 }
-
-var currentRiskEvent = null;
 
 function checkForRiskEvent() {
     var shuffledRisks = risks.slice().sort(() => 0.5 - Math.random());
@@ -495,15 +386,11 @@ function respondToRisk() {
     var response = document.getElementById('riskResponse').value;
     if (response === "") {
         Swal.fire({
-            title: 'Error!',
-            text: 'Please select a risk response action.',
             icon: 'error',
-            confirmButtonText: 'Cool'
-        }).then(() => {
-            console.log("Swal modal closed");
+            title: 'No Action Selected',
+            text: 'Please select a risk response action.',
         });
         return;
-        
     }
 
     var costFromMin = currentRiskEvent.minCost;
@@ -511,17 +398,10 @@ function respondToRisk() {
     var costImpact = Math.max(costFromMin, costFromPercentage);
 
     switch (response) {
-        case "Mitigate":
-            costImpact *= 0.5;
-            break;
-        case "Avoid":
-            costImpact *= 0.75;
-            break;
-        case "Transfer":
-            costImpact *= 0.25;
-            break;
-        case "Accept":
-            break;
+        case "Mitigate": costImpact *= 0.5; break;
+        case "Avoid": costImpact *= 0.75; break;
+        case "Transfer": costImpact *= 0.25; break;
+        case "Accept": break;
     }
 
     if (project.riskContingencyBudget >= costImpact) {
@@ -534,21 +414,20 @@ function respondToRisk() {
 
     var timeImpact = currentRiskEvent.impact * 0.02 * project.originalDuration;
     switch (response) {
-        case "Mitigate":
-            project.duration += timeImpact * 0.5;
-            break;
-        case "Avoid":
-            project.duration += timeImpact * 0.75;
-            break;
-        case "Transfer":
-            project.duration += timeImpact * 0.25;
-            break;
-        case "Accept":
-            project.duration += timeImpact;
-            break;
+        case "Mitigate": project.duration += timeImpact * 0.5; break;
+        case "Avoid": project.duration += timeImpact * 0.75; break;
+        case "Transfer": project.duration += timeImpact * 0.25; break;
+        case "Accept": project.duration += timeImpact; break;
     }
 
     project.quality -= currentRiskEvent.impact * 2;
+    performanceLog.push({
+        turn: currentTurn,
+        risk: currentRiskEvent.name,
+        response: response,
+        costImpact: costImpact,
+        quality: project.quality
+    });
 
     document.getElementById('riskEvent').classList.add('hidden');
     document.getElementById('nextTurnButton').disabled = false;
@@ -566,18 +445,19 @@ function updateProjectStatus() {
     document.getElementById('qualityProgress').style.width = qualityPercent + '%';
     document.getElementById('riskContingencyProgress').style.width = riskContingencyPercent + '%';
 
-    var timeRemaining = Math.max(project.duration - currentTurn, 0);
-    timeRemaining = timeRemaining.toFixed(1);
+    var timeRemaining = Math.max(project.duration - currentTurn, 0).toFixed(1);
+    document.getElementById('projectStatus').innerHTML = `
+        <p>Turn: ${currentTurn} / ${project.originalDuration}</p>
+        <p>Budget Remaining: €${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+        <p>Risk Contingency: €${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+        <p>Time Remaining: ${timeRemaining} months</p>
+        <p>Quality: ${project.quality}%</p>
+    `;
 
-    var status = `
-    <div class="status-line"><span class="label">Turn:</span><span class="value">${currentTurn} / ${project.originalDuration}</span></div>
-    <div class="status-line"><span class="label">Budget Remaining:</span><span class="value">€${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
-    <div class="status-line"><span class="label">Risk Contingency Remaining:</span><span class="value">€${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
-    <div class="status-line"><span class="label">Time Remaining:</span><span class="value">${timeRemaining} months</span></div>
-    <div class="status-line"><span class="label">Quality:</span><span class="value">${project.quality}%</span></div>
-`;
-document.getElementById('projectStatus').innerHTML = status;
-
+    var realTimeScore = calculateFinalScore();
+    document.getElementById('scoreValue').innerText = realTimeScore + "%";
+    var emoji = realTimeScore > 80 ? "🎉" : realTimeScore > 50 ? "👍" : "⚠️";
+    document.getElementById('realTimeScore').innerHTML = `Current Score: <span id="scoreValue">${realTimeScore}%</span> ${emoji}`;
 
     if (project.budget <= 0 || project.quality <= 0) {
         gameOver = true;
@@ -597,132 +477,100 @@ function checkWinCondition() {
 
 function finalizeGame(isSuccess) {
     document.getElementById('simulation').classList.add('hidden');
-    
-    // Game is over, we can reset the flag
-    gameInProgress = false;
-
     let finalScore = calculateFinalScore();
-
+    let grade = getGrade(finalScore);
     let budgetRemaining = (project.budget / project.originalBudget) * 100;
     let riskContingencyRemaining = (project.riskContingencyBudget / project.originalRiskContingencyBudget) * 100;
+
     let finalInfo = `
-        <p><strong>Final Budget Remaining:</strong> €${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${budgetRemaining.toFixed(2)}%)</p>
-        <p><strong>Final Risk Contingency Remaining:</strong> €${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${riskContingencyRemaining.toFixed(2)}%)</p>
-        <p><strong>Final Quality Percentage:</strong> ${project.quality}%</p>
+        <p><strong>Final Budget:</strong> €${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${budgetRemaining.toFixed(2)}%)</p>
+        <p><strong>Final Contingency:</strong> €${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${riskContingencyRemaining.toFixed(2)}%)</p>
+        <p><strong>Final Quality:</strong> ${project.quality}%</p>
     `;
 
-    let message;
-    if (isSuccess) {
-        message = `
-            <h2>Congratulations! Project Completed Successfully</h2>
-            <p>You delivered the software project on budget and maintained high quality.</p>
-            <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnd2d3lrZGhxbm5zZDdkYmI1Zng5Y2VjZGdjYW02dHc3eDdiaHk5cyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/hcnh1VGMNW3Sb8c5aX/giphy.gif" alt="Success GIF">
-        `;
-    } else {
-        var failureReason = '';
-        if (project.budget <= 0 && project.quality <= 50) {
-            failureReason = 'Your project ran out of budget and quality fell below acceptable levels.';
-        } else if (project.budget <= 0) {
-            failureReason = 'Your project ran out of budget before completion.';
-        } else if (project.quality <= 50) {
-            failureReason = 'Your project quality was too low.';
-        } else {
-            failureReason = 'Your project could not be completed successfully.';
-        }
+    let message = isSuccess ?
+        `<h2>Congratulations! Project Completed</h2><p>You delivered the project successfully.</p><img src="https://media0.giphy.com/media/hcnh1VGMNW3Sb8c5aX/giphy.gif" alt="Success">` :
+        `<h2>Game Over: Project Failed</h2><p>${project.budget <= 0 ? "Out of budget" : "Quality too low"}</p><img src="https://media1.giphy.com/media/BGlGy3pD9THOFVzdtf/giphy.gif" class='result-img' alt="Failure">`;
 
-        message = `
-            <h2>Game Over: Project Failed</h2>
-            <p>${failureReason}</p>
-            <img src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnRqcmNzZGhoc2ZidGs5bWN2MWI0MXVucjVqcWozM294a3Vid3NvNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BGlGy3pD9THOFVzdtf/giphy.gif" alt="Failure GIF">
-        `;
-    }
+    let logHtml = "<h3>Performance Log</h3><ul class='performance-log'>";
+    performanceLog.forEach(entry => {
+        logHtml += `<li>Turn ${entry.turn}: Risk "${entry.risk}" - Response: ${entry.response} - Cost: €${entry.costImpact.toLocaleString()} - Quality: ${entry.quality}%</li>`;
+    });
+    logHtml += "</ul>";
 
     document.getElementById('finalResult').innerHTML = `
-    <h2 class="center-text">Simulation Results</h2>
-    <div class="table-container">
- ${finalInfo}
-    </div>
-
-    <h3 class="center-text">Your Overall Score</h3>
-    <div class="table-container">
-        <div class="table-row">
-            
-            <div class="table-cell value">${finalScore}%</div>
-        </div>
-    </div>
-
-    <div class="center-text message">${message}</div>
-
-    <div class="center-text">
+        <h2>Simulation Results</h2>
+        ${finalInfo}
+        <h3>Your Overall Score</h3>
+        <p><strong>${finalScore}%</strong> - Grade: ${grade}</p>
+        ${message}
+        ${logHtml}
         <button class="button-action" onclick="window.print()">Print Results</button>
-        <button id="finalResultBackButton" class="button-action">New Game</button>
-    </div>
-`;
-
+        <button class="button-action" onclick="exportPerformanceLog()">Export Log</button>
+        <button class="button-action" onclick="tryAgain()">Try It Again</button>
+        <button class="button-action" onclick="exportRiskRegisterToExcel()">Export to Excel</button>
+    `;
     document.getElementById('finalResult').classList.remove('hidden');
-    
-    // Add event listener for the back button in the final result section
-    document.getElementById('finalResultBackButton').addEventListener('click', function() {
-        document.getElementById('finalResult').classList.add('hidden');
-        document.getElementById('setup').classList.remove('hidden');
-        resetGame();
-    });
 }
 
 function calculateFinalScore() {
     let budgetRemaining = (project.budget / project.originalBudget) * 100;
     let riskContingencyRemaining = (project.riskContingencyBudget / project.originalRiskContingencyBudget) * 100;
     let qualityRemaining = project.quality;
-
     let score = (budgetRemaining * 0.4) + (qualityRemaining * 0.4) + (riskContingencyRemaining * 0.2);
     return Math.min(score.toFixed(2), 100);
 }
 
-function initializeCharts() {
-    turnLabels.push("0");
-    budgetData.push(project.budget);
-    qualityData.push(project.quality);
+function getGrade(score) {
+    if (score >= 90) return "5 (Excellent)";
+    else if (score >= 75) return "4 (Good)";
+    else if (score >= 55) return "3 (Satisfactory)";
+    else if (score >= 35) return "2 (Needs Improvement)";
+    else if (score >= 15) return "1 (Poor)";
+    else return "0 (Fail)";
+}
 
-    var ctxBudget = document.getElementById('budgetChart').getContext('2d');
-    budgetChart = new Chart(ctxBudget, {
+function initializeCharts() {
+    budgetData = [project.budget];
+    qualityData = [project.quality];
+    turnLabels = ["0"];
+
+    const budgetCtx = document.getElementById('budgetChart').getContext('2d');
+    budgetChartInstance = new Chart(budgetCtx, {
         type: 'line',
         data: {
             labels: turnLabels,
             datasets: [{
-                label: 'Budget Remaining (€)',
+                label: 'Budget (€)',
                 data: budgetData,
                 borderColor: 'rgba(75, 192, 192, 1)',
-                fill: false,
+                fill: false
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             scales: {
-                x: { display: true, title: { display: true, text: 'Turn' } },
-                y: { display: true, title: { display: true, text: 'Budget (€)' }, beginAtZero: true }
+                y: { beginAtZero: true, max: project.originalBudget }
             }
         }
     });
 
-    var ctxQuality = document.getElementById('qualityChart').getContext('2d');
-    qualityChart = new Chart(ctxQuality, {
+    const qualityCtx = document.getElementById('qualityChart').getContext('2d');
+    qualityChartInstance = new Chart(qualityCtx, {
         type: 'line',
         data: {
             labels: turnLabels,
             datasets: [{
-                label: 'Project Quality (%)',
+                label: 'Quality (%)',
                 data: qualityData,
                 borderColor: 'rgba(255, 99, 132, 1)',
-                fill: false,
+                fill: false
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             scales: {
-                x: { display: true, title: { display: true, text: 'Turn' } },
-                y: { display: true, title: { display: true, text: 'Quality (%)' }, min: 0, max: 100 }
+                y: { beginAtZero: true, max: 100 }
             }
         }
     });
@@ -732,103 +580,95 @@ function updateCharts() {
     turnLabels.push(currentTurn.toString());
     budgetData.push(project.budget);
     qualityData.push(project.quality);
-    budgetChart.update();
-    qualityChart.update();
+
+    budgetChartInstance.data.labels = turnLabels;
+    budgetChartInstance.data.datasets[0].data = budgetData;
+    budgetChartInstance.update();
+
+    qualityChartInstance.data.labels = turnLabels;
+    qualityChartInstance.data.datasets[0].data = qualityData;
+    qualityChartInstance.update();
 }
 
 function addRiskResponseListener() {
-    
-        var riskResponseSelect = document.getElementById('riskResponse');
-        riskResponseSelect.addEventListener('change', function() {
-            var response = riskResponseSelect.value;
-            var explanationDiv = document.getElementById('responseExplanation');
-            var explanation = getResponseExplanation(response);
-            explanationDiv.innerHTML = explanation;
-        });
+    var riskResponseSelect = document.getElementById('riskResponse');
+    riskResponseSelect.addEventListener('change', function() {
+        var response = riskResponseSelect.value;
+        document.getElementById('responseExplanation').innerHTML = getResponseExplanation(response);
+    });
 }
 
 function getResponseExplanation(response) {
     switch(response) {
-        case "Mitigate":
-            return `
-                <strong>Mitigate:</strong> Take actions to reduce the likelihood or impact of the risk.<br>
-                <em>Example:</em> Implement code reviews and refactoring sessions.
-            `;
-        case "Avoid":
-            return `
-                <strong>Avoid:</strong> Change plans to eliminate the risk entirely.<br>
-                <em>Example:</em> Modify project scope to exclude high-risk features.
-            `;
-        case "Transfer":
-            return `
-                <strong>Transfer:</strong> Shift the risk to a third party, such as outsourcing or insurance.<br>
-                <em>Example:</em> Outsource non-core functionalities to mitigate risk.
-            `;
-        case "Accept":
-            return `
-                <strong>Accept:</strong> Acknowledge the risk and decide to manage it if it occurs.<br>
-                <em>Example:</em> Proceed without additional measures for minor risks.
-            `;
-        default:
-            return "";
+        case "Mitigate": return "<strong>Mitigate:</strong> Reduce likelihood or impact.<br><em>Example:</em> Add code reviews.";
+        case "Avoid": return "<strong>Avoid:</strong> Eliminate the risk.<br><em>Example:</em> Cut high-risk features.";
+        case "Transfer": return "<strong>Transfer:</strong> Shift to a third party.<br><em>Example:</em> Outsource.";
+        case "Accept": return "<strong>Accept:</strong> Manage if it occurs.<br><em>Example:</em> Proceed as is.";
+        default: return "";
     }
 }
 
-function exportRiskRegister() {
-    if (risks.length === 0) {
-        Swal.fire({
-            title: 'Error!',
-            text: 'No risks to export.',
-            icon: 'question',
-            confirmButtonText: 'Cool'
-        }).then(() => {
-            console.log("Swal modal closed");
-        });
-        return;
-       
-    }
-
-    var ws_data = [
-        ["Risk Name", "Type", "Likelihood", "Impact", "Min Cost (€)", "Cost (% of Budget)", "Risk Score", "Risk Level", "Risk Response Description"]
-    ];
-
-    risks.forEach(function(risk) {
-        ws_data.push([
-            risk.name,
-            risk.type,
-            risk.likelihood,
-            risk.impact,
-            risk.minCost,
-            risk.costPercentage + "%",
-            risk.score,
-            risk.level,
-            risk.responseDescription
-        ]);
+function exportPerformanceLog() {
+    let csvContent = "Turn,Risk,Response,Cost Impact (€),Quality (%)\n";
+    performanceLog.forEach(entry => {
+        csvContent += `${entry.turn},${entry.risk},${entry.response},${entry.costImpact},${entry.quality}\n`;
     });
-
-    var ws = XLSX.utils.aoa_to_sheet(ws_data);
-    var wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Risk Register");
-    var timestamp = new Date().toISOString().slice(0,19).replace(/[:T]/g, "-");
-    XLSX.writeFile(wb, "risk_register_" + timestamp + ".xlsx");
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `performance_log_${timestamp}.csv`;
+    link.click();
 }
 
 function setupHelpModal() {
     var modal = document.getElementById('helpModal');
     var btn = document.getElementById('helpButton');
-    var span = document.getElementsByClassName('close')[0];
-
-    btn.onclick = function() {
-        modal.style.display = "block";
-    }
-
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-
+    var span = document.querySelector('.close');
+    btn.onclick = function() { modal.style.display = "block"; };
+    span.onclick = function() { modal.style.display = "none"; };
     window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
+        if (event.target == modal) modal.style.display = "none";
+    };
+}
+
+function goBack() {
+    if (!document.getElementById('game').classList.contains('hidden')) {
+        document.getElementById('game').classList.add('hidden');
+        document.getElementById('setup').classList.remove('hidden');
+        document.getElementById('exportButton').classList.add('hidden');
+    } else {
+        Swal.fire({
+            icon: 'info',
+            title: 'Navigation Restricted',
+            text: 'Cannot go back after starting the game or during simulation.',
+        });
     }
+}
+
+function tryAgain() {
+    project = {};
+    risks = [];
+    currentTurn = 0;
+    gameOver = false;
+    budgetData = [];
+    qualityData = [];
+    turnLabels = [];
+    currentRiskEvent = null;
+    performanceLog = [];
+    if (budgetChartInstance) budgetChartInstance.destroy();
+    if (qualityChartInstance) qualityChartInstance.destroy();
+
+    document.getElementById('finalResult').classList.add('hidden');
+    document.getElementById('setup').classList.remove('hidden');
+    document.getElementById('game').classList.add('hidden');
+    document.getElementById('simulation').classList.add('hidden');
+    document.getElementById('gameBackButton').disabled = true;
+    document.getElementById('projectName').value = "";
+    document.getElementById('projectBudget').value = "100";
+    document.getElementById('projectDuration').value = "24";
+    document.getElementById('riskContingencyPercentage').value = "10";
+    document.getElementById('exportButton').classList.add('hidden');
+    setDefaultProjectName();
+    updateBaselineCost();
 }

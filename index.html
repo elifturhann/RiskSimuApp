@@ -1,211 +1,174 @@
 <!DOCTYPE html>
-
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' 'inline-speculation-rules' chrome-extension://ee91a8dc-b6cf-41c9-aaa8-9883e66c1512/ https://cdn.jsdelivr.net https://cdnjs.cloudflare.com">
-   
     <title>Risk Simulation Game for Software Engineering</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <!-- Include Chart.js from CDN -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <script nonce="random123" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script nonce="random123" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
     <script nonce="random123" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- For the CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    
 </head>
 <body>
-   <div class="container">
-    <div class="container1">
+    <div class="container">
         <div class="header">
-        <!-- Help Button -->
-       <button id="helpButton">Help</button>
-       
-        <!-- Logo Image -->
-        <!-- <img src="https://www.vamk.fi/wp-content/themes/design-by-buorre-child-vamk/img/vamk_logo_notext.svg" alt="VAMK Logo" class="logo" style="max-width: 200px; margin: auto; justify-content: center;align-items: center;display: flex; padding-bottom: 20px; "> -->
-        <img src="assets/favicon.png" alt="header" id="header-img">
-    <!-- <h1 class="game-title" style="text-align: center;">Risk Simulation Game for Software Engineering</h1> -->
-    
-    </div>
-    
-    <!-- Project Setup -->
-    <div id="setup">
-      <div class="form-group">
-        <p  class="game-description">In this interactive simulation, you take on the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks. Your strategic decisions will determine the project's outcome.</p><br>
-        <h2 style="text-align: center;">Project Setup</h2>
-        <label for="projectName">Project Name:</label>
-        <input type="text" id="projectName"><br>
-
-        <!-- The budget here is in thousands (€k). The code later converts the input value to euros. -->
-        <label for="projectBudget">Project Budget (in €k):</label>
-        <input type="number" id="projectBudget" value="100" onchange="updateBaselineCost()"><br>
-
-        <label for="projectDuration">Project Duration (months):</label>
-        <input type="number" id="projectDuration" value="24" onchange="updateBaselineCost()"><br>
-
-        <!-- Baseline Cost per Turn auto-calculated and displayed in €k -->
-        <label for="baselineCost">Baseline Cost per Turn (in €k):</label>
-        <input type="number" id="baselineCost" readonly><br>
-
-        <label for="riskContingencyPercentage">Risk Contingency Budget (% of Total Budget):</label>
-        <input type="number" id="riskContingencyPercentage" value="10"><br>
-
-        <button id="startGameButton" class="button-action">Start Game</button>
-      </div>
-    </div>
-</div>
-
-    <!-- Game and Simulation Sections -->
-     <div class="container1">
-       
-    <div id="game"  class="hidden" >
-        <!-- Add this button near the top of your game section -->
-    <button id="gameBackButton" class="btn"><i class="fa-solid fa-chevron-left"></i></button>
-        <h2 style="text-align: center;">Add a Risk (Add at least 5 risks!)</h2>
-        <div class="risk-group">
-            <div class="form-row">
-                <label for="riskName">Risk Name:</label>
-                <input type="text" id="riskName" placeholder="e.g., Requirement Creep">
+            <div>
+                <button id="helpButton">Help</button>
             </div>
-            <div class="form-row">
-                <label for="riskType">Risk Type:</label>
-                <select id="riskType">
-                    <option value="Technical">Technical</option>
-                    <option value="Operational">Operational</option>
-                    <option value="Security">Security</option>
-                    <option value="Scope">Scope</option>
-                    <option value="Management">Management</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <label for="likelihood">Likelihood (1-5):</label>
-                <input type="number" id="likelihood" min="1" max="5" value="3">
-            </div>
-            <div class="form-row">
-                <label for="impact">Impact (1-5):</label>
-                <input type="number" id="impact" min="1" max="5" value="3">
-            </div>
-            <div class="form-row">
-                <label for="minCost">Minimum Cost if Occurs (€):</label>
-                <input type="number" id="minCost" value="5000">
-            </div>
-            <div class="form-row">
-                <label for="costPercentage">Cost as % of Budget:</label>
-                <input type="number" id="costPercentage" value="5">
-            </div>
-            <div class="form-row">
-                <label for="riskResponseDescription">Risk Response Description:</label>
-                <input type="text" id="riskResponseDescription" placeholder="e.g., Implement agile practices to control scope">
-            </div>
-            <button class="button-action" onclick="addRisk()">Add Risk</button>
+            <img src="assets/favicon.png" alt="header" id="header-img">
         </div>
 
-
-        <h2 style="text-align: center;">Risk Register</h2>
-        <!-- Button Container for Alignment -->
-        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
-            <button class="button-action" onclick="proceedToSimulation()">Proceed to Simulation</button>
-            <button class="button-action" onclick="exportRiskRegister()">Export to Excel</button>
+        <div id="setup">
+            <p class="game-description">In this interactive simulation, you take on the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks. Your strategic decisions will determine the project's outcome.</p><br>
+            <h2 style="text-align: center;">Project Setup</h2>
+            <label for="projectName">Project Name:</label>
+            <input type="text" id="projectName"><br>
+            <label for="projectBudget">Project Budget (in €k):</label>
+            <input type="number" id="projectBudget" value="100" onchange="updateBaselineCost()"><br>
+            <label for="projectDuration">Project Duration (months):</label>
+            <input type="number" id="projectDuration" value="24" onchange="updateBaselineCost()"><br>
+            <label for="baselineCost">Baseline Cost per Turn (in €k):</label>
+            <input type="number" id="baselineCost" readonly><br>
+            <label for="riskContingencyPercentage">Risk Contingency Budget (% of Total Budget):</label>
+            <input type="number" id="riskContingencyPercentage" value="10"><br>
+            <button id="startGameButton" class="button-action" onclick="startGame()">Start Game</button>
         </div>
-        <table id="riskTable">
-            <tr>
-                <th>Risk Name</th>
-                <th>Type</th>
-                <th>Likelihood</th>
-                <th>Impact</th>
-                <th>Min Cost (€)</th>
-                <th>Cost (% of Budget)</th>
-                <th>Risk Score</th>
-                <th>Risk Level</th>
-                <th>Risk Response Description</th>
-            </tr>
-        </table>
-    </div>
-</div>
 
-<div class="container1">
-    <div id="simulation" class="hidden" >
-    <button id="simulationBackButton" class="btn"><i class="fa-solid fa-chevron-left"></i></button>
-        <h2 style="text-align: center;">Simulation</h2>
-        <p id="simulationInfo"></p>
+        <div id="game" class="hidden">
+            <button id="gameBackButton" class="btn" onclick="goBack()"><i class="fa-solid fa-chevron-left"></i></button>
+            <h2 style="text-align: center;">Add a Risk (Add at least 5 risks!)</h2>
+            <div class="risk-group">
+                <div class="form-row">
+                    <label for="riskName">Risk Name:</label>
+                    <input type="text" id="riskName" placeholder="e.g., Requirement Creep">
+                </div>
+                <div class="form-row">
+                    <label for="riskType">Risk Type:</label>
+                    <select id="riskType">
+                        <option value="Technical">Technical</option>
+                        <option value="Operational">Operational</option>
+                        <option value="Security">Security</option>
+                        <option value="Scope">Scope</option>
+                        <option value="Management">Management</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="likelihood">Likelihood (1-5):</label>
+                    <input type="number" id="likelihood" min="1" max="5" value="3">
+                </div>
+                <div class="form-row">
+                    <label for="impact">Impact (1-5):</label>
+                    <input type="number" id="impact" min="1" max="5" value="3">
+                </div>
+                <div class="form-row">
+                    <label for="minCost">Minimum Cost if Occurs (€):</label>
+                    <input type="number" id="minCost" value="5000">
+                </div>
+                <div class="form-row">
+                    <label for="costPercentage">Cost as % of Budget:</label>
+                    <input type="number" id="costPercentage" value="5">
+                </div>
+                <div class="form-row">
+                    <label for="riskResponseDescription">Risk Response Description:</label>
+                    <input type="text" id="riskResponseDescription" placeholder="e.g., Implement agile practices to control scope">
+                </div>
+                <button class="button-action" onclick="addRisk()">Add Risk</button>
+            </div>
 
-        <div id="riskEvent" class="hidden"><br>
-            <h3 style="text-align: center;">Risk Event Occurred!</h3>
-            
-            <div id="riskEventDescription"></div>
-            <label for="riskResponse"style=" margin-left:30%; font-weight:bold">Choose Your Response:</label>
-            <select id="riskResponse" >
-                <option value="">--Select an Action--</option>
-                <option value="Mitigate">Mitigate</option>
-                <option value="Avoid">Avoid</option>
-                <option value="Transfer">Transfer</option>
-                <option value="Accept">Accept</option>
-            </select><br>
-       
-            <div id="responseExplanation" style=" margin-left:35%;"></div>
-            <button class="button-action" onclick="respondToRisk()">Respond</button>
+            <h2 style="text-align: center;margin-top: 10px;">Risk Register</h2>
+            <div style="display: flex; justify-content: space-between;margin-top: 10px;">
+                <button class="button-action" onclick="proceedToSimulation()">Proceed to Simulation</button>
+                <button class="button-action" onclick="exportRiskRegisterToExcel()">Export to Excel</button>
+            </div>
+            <table id="riskTable">
+                <tr>
+                    <th>Risk Name</th>
+                    <th>Type</th>
+                    <th>Likelihood</th>
+                    <th>Impact</th>
+                    <th>Min Cost (€)</th>
+                    <th>Cost (% of Budget)</th>
+                    <th>Risk Score</th>
+                    <th>Risk Level</th>
+                    <th>Risk Response Description</th>
+                    <th>Action</th>
+                </tr>
+            </table>
         </div>
-        <button id="nextTurnButton" class="button-action" onclick="nextTurn()">Next Turn</button>
 
+        <div id="simulation" class="hidden">
+            <h2 style="text-align: center;">Simulation</h2>
+            <p id="realTimeScore">Current Score: <span id="scoreValue">0%</span></p>
+            <p id="simulationInfo"></p>
+            <div id="riskEvent" class="hidden"><br>
+                <h3 style="text-align: center;">Risk Event Occurred!</h3>
+                <div id="riskEventDescription"></div>
+                <label for="riskResponse" style="margin-left:30%; font-weight:bold">Choose Your Response:</label>
+                <select id="riskResponse">
+                    <option value="">--Select an Action--</option>
+                    <option value="Mitigate">Mitigate</option>
+                    <option value="Avoid">Avoid</option>
+                    <option value="Transfer">Transfer</option>
+                    <option value="Accept">Accept</option>
+                </select><br>
+                <div id="responseExplanation" style="margin-left:35%;"></div>
+                <button class="button-action" onclick="respondToRisk()">Respond</button>
+            </div>
+            <button id="nextTurnButton" class="button-action" onclick="nextTurn()">Next Turn</button>
 
-        <h2 style="text-align: center;">Project Status</h2>
-        <div class="progress-bar">
-            <span class="progress-label">Budget Remaining:</span>
-            <div class="progress-container">
-                <div id="budgetProgress" class="progress"></div>
+            <h2 style="text-align: center;">Project Status</h2>
+            <div class="progress-bar">
+                <span class="progress-label">Budget Remaining:</span>
+                <div class="progress-container">
+                    <div id="budgetProgress" class="progress"></div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <span class="progress-label">Project Quality:</span>
+                <div class="progress-container">
+                    <div id="qualityProgress" class="progress"></div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <span class="progress-label">Risk Contingency Remaining:</span>
+                <div class="progress-container">
+                    <div id="riskContingencyProgress" class="progress"></div>
+                </div>
+            </div>
+            <p id="projectStatus"></p>
+            <div id="charts">
+                <canvas id="budgetChart" width="400" height="200"></canvas>
+                <canvas id="qualityChart" width="400" height="200"></canvas>
             </div>
         </div>
-        <div class="progress-bar">
-            <span class="progress-label">Project Quality:</span>
-            <div class="progress-container">
-                <div id="qualityProgress" class="progress"></div>
-            </div>
-        </div>
-        <div class="progress-bar">
-            <span class="progress-label">Risk Contingency Remaining:</span>
-            <div class="progress-container">
-                <div id="riskContingencyProgress" class="progress"></div>
-            </div>
-        </div>
-        <p id="projectStatus"></p>
 
-        <div id="charts">
-            <canvas id="budgetChart" width="400" height="200"></canvas>
-            <canvas id="qualityChart" width="400" height="200"></canvas>
+        <div id="gameStatus"></div>
+
+        <div id="finalResult" class="hidden">
+            <h2>Simulation Results</h2><br>
+            <div id="finalProjectInfo"></div>
+            <h3>Your Overall Score:</h3>
+            <p id="finalScore"></p>
+            <button class="button-action" onclick="window.print()">Print Results</button>
+            <button class="button-action" onclick="exportPerformanceLog()">Export Log</button>
+            <button class="button-action" onclick="tryAgain()">Try It Again</button>
+            <button class="button-action" onclick="exportRiskRegisterToExcel()">Export to Excel</button>
         </div>
     </div>
-    
-    <div id="gameStatus"></div>
 
-</div>
-
-<div class="container1">
-    <!-- Final Project Result Section -->
-    <div id="finalResult" class="hidden" >
-        <h2>Simulation Results</h2><br>
-        <div id="finalProjectInfo"></div>
-        <h3>Your Overall Score: </h3>
-        <p id="finalScore"></p>
-        <button class="button-action" onclick="window.print()">Print Results</button>
-    </div>
-</div>
-</div>
-
-    <!-- Help Modal -->
     <div id="helpModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close">×</span>
             <h2>Risk Simulation Game Instructions - Software Engineering</h2>
+            <!-- Help modal content remains unchanged -->
             <p>Welcome to the <strong>Risk Simulation Game for Software Engineering</strong>! In this interactive simulation, you assume the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks.</p>
-
             <h3>How It Works</h3>
             <ol>
                 <li><strong>Project Setup</strong>:
@@ -284,11 +247,7 @@
             <p>Good luck managing your software project and refining your risk management skills!</p>
         </div>
     </div>
-   </div>
 
-    <!-- JavaScript Code -->
-   
     <script nonce="random123" type="text/javascript" src="main.js"></script>
-   
 </body>
 </html>

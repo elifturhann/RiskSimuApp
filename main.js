@@ -62,7 +62,7 @@ function startGame() {
     let projectBudgetValue = parseFloat(projectBudget.value) * 1000;
     let projectDurationValue = parseInt(projectDuration.value);
     let baselineCostPerTurnValue = parseFloat(baselineCostPerTurn.value) * 1000;
-    let riskContingencyPercentageValue = parseFloat(riskContingencyPercentage.value);
+    let riskContingencyPercentageValue = parseFloat(riskContingencyPercentage.value); 
 
     if (projectNameValue === "") {
         Swal.fire({
@@ -198,6 +198,22 @@ function addRisk() {
             icon: 'error',
             title: 'Missing Input',
             text: 'Please enter a risk response description.',
+        });
+        return;
+    }
+    if (isNaN(likelihood)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Missing Input',
+            text: 'Please specify the risk likelihood.',
+        });
+        return;
+    }
+    if (isNaN(impact)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Missing Input',
+            text: 'Please specify the impact level.',
         });
         return;
     }

@@ -53,12 +53,14 @@ function updateBaselineCost() {
 
 function startGame() {
     let projectNameInput = document.getElementById('projectName');
+    let simulatorNameInput = document.getElementById('simulatorName'); // New input
     let projectBudget = document.getElementById('projectBudget');
     let projectDuration = document.getElementById('projectDuration');
     let baselineCostPerTurn = document.getElementById('baselineCost');
     let riskContingencyPercentage = document.getElementById('riskContingencyPercentage');
 
     let projectNameValue = projectNameInput.value.trim().toLowerCase();
+    let simulatorNameValue = simulatorNameInput.value.trim(); // Capture simulator name
     let projectBudgetValue = parseFloat(projectBudget.value) * 1000;
     let projectDurationValue = parseInt(projectDuration.value);
     let baselineCostPerTurnValue = parseFloat(baselineCostPerTurn.value) * 1000;
@@ -72,35 +74,19 @@ function startGame() {
         });
         return;
     }
+    if (simulatorNameValue === "") { // Validate simulator name
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...,Error',
+            text: 'Please enter your name.',
+        });
+        return;
+    }
     if (isNaN(projectBudgetValue) || projectBudgetValue <= 0) {
         Swal.fire({
             icon: 'error',
             title: 'Invalid Input',
             text: 'Invalid Project Budget. Please enter a positive number.',
-        });
-        return;
-    }
-    if (isNaN(projectDurationValue) || projectDurationValue <= 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid Input',
-            text: 'Invalid Project Duration. Please enter a positive integer.',
-        });
-        return;
-    }
-    if (isNaN(baselineCostPerTurnValue) || baselineCostPerTurnValue <= 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid Input',
-            text: 'Invalid Baseline Cost per Turn. Please enter a positive number.',
-        });
-        return;
-    }
-    if (isNaN(riskContingencyPercentageValue) || riskContingencyPercentageValue < 0) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Invalid Input',
-            text: 'Invalid Risk Contingency Percentage. Please enter a non-negative number.',
         });
         return;
     }
@@ -119,6 +105,7 @@ function startGame() {
 
     project = {
         name: projectNameValue,
+        simulatorName: simulatorNameValue, // Add simulator name to project object
         budget: projectBudgetValue,
         originalBudget: projectBudgetValue,
         riskContingencyBudget: riskContingencyBudget,
@@ -201,22 +188,40 @@ function addRisk() {
         });
         return;
     }
-    if (isNaN(likelihood)) {
+    if (isNaN(likelihood) || likelihood <= 0 || likelihood > 5) {
         Swal.fire({
             icon: 'error',
             title: 'Missing Input',
-            text: 'Please specify the risk likelihood.',
+            text: 'Please specify the risk likelihood.It must be between 1 and 5.',
         });
         return;
     }
-    if (isNaN(impact)) {
+    if (isNaN(impact) || impact <= 0 || impact > 5) {
         Swal.fire({
             icon: 'error',
             title: 'Missing Input',
-            text: 'Please specify the impact level.',
+            text: 'Please specify the impact level.It must be between 1 and 5.',
         });
         return;
     }
+    if (isNaN(minCost) || minCost <= 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Missing Input',
+            text: 'Please specify the Minimum Cost if Occurs.',
+        });
+        return;
+    }
+
+    if (isNaN(costPercentage) || costPercentage <= 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Missing Input',
+            text: 'Please specify the Cost as % of Budget.',
+        });
+        return;
+    }
+
 
     var riskScore = likelihood * impact;
     var riskLevel = getRiskLevel(riskScore);
@@ -515,7 +520,11 @@ function finalizeGame(isSuccess) {
     logHtml += "</ul>";
 
     document.getElementById('finalResult').innerHTML = `
-        <h2>Simulation Results</h2>
+        <h1 class="result-title">Simulation Results</h1>
+        <div class="result-names">
+            <p class="big-name">Project: ${project.name}</p>
+            <p class="big-name">Managed by: ${project.simulatorName}</p>
+        </div>
         ${finalInfo}
         <h3>Your Overall Score</h3>
         <p><strong>${finalScore}%</strong> - Grade: ${grade}</p>
@@ -681,6 +690,7 @@ function tryAgain() {
     document.getElementById('simulation').classList.add('hidden');
     document.getElementById('gameBackButton').disabled = true;
     document.getElementById('projectName').value = "";
+    document.getElementById('simulatorName').value = ""; // Reset new input
     document.getElementById('projectBudget').value = "100";
     document.getElementById('projectDuration').value = "24";
     document.getElementById('riskContingencyPercentage').value = "10";

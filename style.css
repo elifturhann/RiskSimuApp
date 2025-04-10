@@ -398,3 +398,30 @@ th {
     margin-bottom: 20px;
 }
 
+#finalResult {
+    text-align: center;
+}
+
+#finalResult img {
+    max-width: 20%;
+    height: auto;
+    margin-top: 20px;
+    margin-left: 0;
+    display: inline-block;
+}
+
+.result-title {
+    font-size: 2.5em; /* Larger title */
+    margin-bottom: 20px;
+}
+
+.result-names {
+    margin: 20px 0;
+}
+
+.big-name {
+    font-size: 1.8em; /* Big and clear text for names */
+    font-weight: bold;
+    color: #333; /* Darker color for clarity */
+    margin: 10px 0;
+}

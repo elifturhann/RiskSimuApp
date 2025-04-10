@@ -540,11 +540,11 @@ function finalizeGame(isSuccess) {
          <h1 class="result-title">Simulation Results</h1>
     <div class="result-names">
         <p class="big-name">
-            <span class="label-text">Project:</span>
+            <span class="label-text">Project: </span>
             <span class="value-text">${project.name}</span>
         </p>
         <p class="big-name">
-            <span class="label-text">Managed by:</span>
+            <span class="label-text">Managed by: </span>
             <span class="value-text">${project.simulatorName}</span>
         </p>
     </div>

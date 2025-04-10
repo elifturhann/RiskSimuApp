@@ -554,9 +554,9 @@ function finalizeGame(isSuccess) {
     ${message}
     ${logHtml}
     <button class="button-action" onclick="window.print()">Print Results</button>
-    <button class="button-action" onclick="exportPerformanceLog()">Export Log</button>
+    <button class="button-action" onclick="exportPerformanceLog()">Export Performance Log to Excel</button>
+    <button class="button-action" onclick="exportRiskRegisterToExcel()">Export Risk Register to Excel</button>
     <button class="button-action" onclick="tryAgain()">Try It Again</button>
-    <button class="button-action" onclick="exportRiskRegisterToExcel()">Export to Excel</button>
     `;
     document.getElementById('finalResult').classList.remove('hidden');
 }

@@ -87,7 +87,7 @@
             <h2 style="text-align: center;margin-top: 10px;">Risk Register</h2>
             <div style="display: flex; justify-content: space-between;margin-top: 10px;">
                 <button class="button-action" onclick="proceedToSimulation()">Proceed to Simulation</button>
-                <button class="button-action" onclick="exportRiskRegisterToExcel()">Export to Excel</button>
+                <button class="button-action" onclick="exportRiskRegisterToExcel()">Export Risk Register to Excel</button>
             </div>
             <table id="riskTable">
                 <tr>
@@ -125,7 +125,7 @@
             </div>
             <div style="display: flex;margin-top: 10px;">
                 <button id="nextTurnButton" class="button-action" onclick="nextTurn()">Next Turn</button>
-                <button class="button-action" onclick="exportRiskRegisterToExcel()">Export to Excel</button>
+                <button class="button-action" onclick="exportRiskRegisterToExcel()">Export Risk Register to Excel</button>
             </div>
             <h2 style="text-align: center;">Project Status</h2>
             <div class="progress-bar">
@@ -161,9 +161,9 @@
             <h3>Your Overall Score:</h3><br>
             <p id="finalScore"></p>
             <button class="button-action" onclick="window.print()">Print Results</button>
-            <button class="button-action" onclick="exportPerformanceLog()">Export Log</button>
+            <button class="button-action" onclick="exportPerformanceLog()">Export Performance Log to Excel</button>
             <button class="button-action" onclick="tryAgain()">Try It Again</button>
-            <button class="button-action" onclick="exportRiskRegisterToExcel()">Export to Excel</button>
+            <button class="button-action" onclick="exportRiskRegisterToExcel()">Export Risk Register to Excel</button>
         </div>
     </div>
 
@@ -172,20 +172,22 @@
             <span class="close">×</span>
             <h2>Risk Simulation Game Instructions - Software Engineering</h2>
             <!-- Help modal content remains unchanged -->
-            <p>Welcome to the <strong>Risk Simulation Game for Software Engineering</strong>! In this interactive simulation, you assume the role of a project manager responsible for delivering a successful software project by identifying and managing potential risks.</p>
+            <p>Welcome to the <strong>Risk Simulation Game for Software Engineering</strong>! In this interactive simulation, you assume the role of a project manager tasked with delivering a successful software project by identifying and managing potential risks. This updated version introduces new features for tracking and grading your performance, ensuring an even more engaging experience.</p>
             <h3>How It Works</h3>
             <ol>
                 <li><strong>Project Setup</strong>:
                     <ul>
-                        <li><strong>Project Name</strong>: Enter a unique name for your software project.</li>
+                        <li><strong>Project Name</strong>: Enter a unique name for your software project. This will be displayed at the end of the simulation along with your performance log.</li>
+                        <li><strong>Your Name</strong>: Input your name, which will be shown at the end of the simulation in the performance summary.</li>
                         <li><strong>Project Budget</strong>: Specify the total budget for your project in €k.</li>
                         <li><strong>Project Duration</strong>: Set the project duration in months.</li>
+                        <li><strong>Baseline Cost per Turn</strong>: Define the portion of your budget deducted each turn as the baseline cost (e.g., €5k).</li>
                         <li><strong>Risk Contingency Budget</strong>: Allocate a percentage of your total budget to handle unforeseen risks.</li>
                     </ul>
                 </li>
                 <li><strong>Adding Risks</strong>:
                     <ul>
-                        <li><strong>Risk Details</strong>: Add at least five risks by providing:
+                        <li><strong>Provide details for at least five risks</strong>:
                             <ul>
                                 <li><strong>Risk Name</strong>: A descriptive name (e.g., "Requirement Creep").</li>
                                 <li><strong>Risk Type</strong>: Categorize the risk (e.g., Technical, Operational, Security, Scope, Management).</li>
@@ -195,14 +197,16 @@
                                 <li><strong>Cost as % of Budget</strong>: Specify the cost impact as a percentage of the total budget.</li>
                                 <li><strong>Risk Response Description</strong>: Describe your strategy to address the risk.</li>
                             </ul>
+                        <li>You can export your Risk Register to an Excel file at any time for further analysis.
                         </li>
                     </ul>
+                    <p><em><strong>Note</strong>: A back button is available on the Project Setup and Adding Risks screens to allow you to review or modify your inputs. Once the simulation begins, the back button will no longer be available.</em>
                 </li>
                 <li><strong>Simulation Turns</strong>:
                     <ul>
                         <li>The simulation advances in turns (each turn representing one month of the project).</li>
-                        <li><strong>Baseline Costs</strong>: Each turn, a portion of your budget is deducted as the baseline cost.</li>
-                        <li><strong>Risk Events</strong>: Random risk events may occur. When a risk occurs, choose a response:
+                        <li><strong>Baseline Costs</strong>: Each turn, the specified amount (e.g., €5k) is deducted from your budget as the baseline cost.</li>
+                        <li><strong>Risk Events</strong>: Random risk events may occur. Note that not all risks might not occur during the simulation. When a risk occurs, choose a response:
                             <ul>
                                 <li><strong>Mitigate</strong>: Reduce the risk's likelihood or impact.</li>
                                 <li><strong>Avoid</strong>: Alter project plans to eliminate the risk.</li>
@@ -214,31 +218,56 @@
                 </li>
                 <li><strong>Project Status Tracking</strong>:
                     <ul>
-                        <li><strong>Budget Remaining</strong>: Monitors your available funds.</li>
-                        <li><strong>Project Quality</strong>: Reflects the overall quality of your software product.</li>
-                        <li><strong>Risk Contingency Remaining</strong>: Shows the funds reserved for handling risks.</li>
+                        <li><strong>Monitor key metrics throughout the project</strong>:
+                            <ul>
+                                <li><strong>Budget Remaining</strong>: Tracks your available funds.</li>
+                                <li><strong>Project Quality</strong>: Reflects the overall quality of your software product.</li>
+                                <li><strong>Risk Contingency Remaining</strong>: Shows the funds reserved for handling risks.</li>
+                            </ul>
+                        </li>     
                     </ul>
                 </li>
                 <li><strong>Scoring System</strong>:
                     <ul>
-                        <li>Your final score is based on:
+                        <li><strong>At the end of the simulation, your final score is calculated as follows</strong>:
                             <ul>
-                                <li>Budget Remaining (40%)</li>
-                                <li>Project Quality (40%)</li>
-                                <li>Risk Contingency Remaining (20%)</li>
+                                <li><strong>Budget Remaining</strong>: The percentage of your original budget remaining (40% weight).</li>
+                                <li><strong>Risk Contingency Remaining</strong>: The percentage of your original risk contingency budget remaining (20% weight).</li>
+                                <li><strong>Project Quality</strong>: The final quality score of your project (40% weight).</li>
                             </ul>
                         </li>
-                        <li>A higher score indicates better risk management and overall project success.</li>
+                        <li><strong>The formula for calculating the score is</strong>:
+                            <ul>
+                                <li>Score = (Budget Remaining * 0.4) + (Project Quality * 0.4) + (Risk Contingency Remaining * 0.2)</li>
+                            </ul>
+                        </li>
+                        <li><strong>The score is capped at 100 and graded as follows</strong>:
+                            <ul>
+                                <li>5 (Excellent): Score ≥ 90</li>
+                                <li>4 (Good): Score ≥ 75</li>
+                                <li>3 (Satisfactory): Score ≥ 55</li>
+                                <li>2 (Needs Improvement): Score ≥ 35</li>
+                                <li>1 (Poor): Score ≥ 15</li>
+                                <li>0 (Fail): Score < 15</li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>
-                <li><strong>Exporting Risk Register</strong>:
+                <li><strong>Exporting Risk Register and Performance Log</strong>:
                     <ul>
-                        <li>You can export your Risk Register to an Excel file at any time for further analysis.</li>
+                        <li><strong>Risk Register</strong>: Export your list of risks to an Excel file at any point during the simulation for further analysis.</li>
+                        <li><strong>Performance Log</strong>: At the end of the simulation, a detailed log will display your name, decisions, risk management strategies, and final score. This log can also be exported to Excel for future reference.</li>
                     </ul>
                 </li>
                 <li><strong>Final Results</strong>:
                     <ul>
-                        <li>At simulation end, you’ll receive a summary of your performance, including detailed metrics and an overall score.</li>
+                        <li><strong>At the end of the simulation, you will receive a summary of your performance, including</strong>:
+                            <ul>
+                                <li>Your name</li>
+                                <li>A detailed performance log (including risks and responses)</li>
+                                <li>Overall score (percentage and grading schema 0-5)</li>
+                            </ul>
+                        </li>                    
                     </ul>
                 </li>
             </ol>

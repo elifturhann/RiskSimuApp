@@ -123,8 +123,10 @@
                 <div id="responseExplanation" style="margin-left:35%;"></div>
                 <button class="button-action" onclick="respondToRisk()">Respond</button>
             </div>
-            <button id="nextTurnButton" class="button-action" onclick="nextTurn()">Next Turn</button>
-
+            <div style="display: flex;margin-top: 10px;">
+                <button id="nextTurnButton" class="button-action" onclick="nextTurn()">Next Turn</button>
+                <button class="button-action" onclick="exportRiskRegisterToExcel()">Export to Excel</button>
+            </div>
             <h2 style="text-align: center;">Project Status</h2>
             <div class="progress-bar">
                 <span class="progress-label">Budget Remaining:</span>

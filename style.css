@@ -44,9 +44,9 @@ h2, h3 {
 }
 
 #header-img {
-    width: 100%;
+    width: 60%;
     margin: auto;
-    padding: 10px;
+    padding: 5px;
 }
 
 .btn {
@@ -196,13 +196,13 @@ th {
 }
 
 .game-description {
-    text-align: center;
-    font-family: 'Roboto Condensed', sans-serif;
+    text-align: center; 
+    font-family: Roboto Condensed, sans-serif; 
     font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
+    font-weight:400; 
+    font-style:normal;
     padding: 10px;
-    width: 90%;
+    width:600px;
     margin: auto;
 }
 
@@ -294,17 +294,22 @@ th {
 }
 
 .table-container {
-    display: table;
-    margin: 0 auto;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 10px;
     width: 100%;
-}
-
-.table-row {
-    display: table-row;
-    text-align: center;
-}
+    max-width: 400px;         
+  }
+  
+  .table-row {
+    display: flex;
+    width: 100%;              
+    max-width: 500px;          
+    margin-bottom: 8px;
+    justify-content: center;
+  }
+  
 
 .table-cell {
     display: table-cell;
@@ -390,13 +395,32 @@ th {
     color: black;
     text-decoration: none;
 }
-
-.performance-log{
-    color: darkgoldenrod;
-    list-style: none;
-    margin-top: 20px;
-    margin-bottom: 20px;
+.table-container {
+    display: table;
+    margin: 0 auto;
+    text-align: center;
+    padding: 10px;
+    width: 100%;
 }
+.performance-log-container {
+    display: flex;
+    justify-content: center;  
+    padding: 10px;
+    width: 100%;
+  }
+  .performance-log {
+    list-style-type: none;     
+    padding-left: 50;           
+    text-align: left;         
+    max-width: 600px;         
+    width: 100%;
+    color: darkgoldenrod;
+  }
+  
+  .performance-log li {
+    margin-bottom: 8px;       
+  }
+
 
 #finalResult {
     text-align: center;
@@ -411,17 +435,22 @@ th {
 }
 
 .result-title {
-    font-size: 2.5em; /* Larger title */
+    font-size: 2em; 
     margin-bottom: 20px;
 }
 
 .result-names {
-    margin: 20px 0;
+    display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .big-name {
-    font-size: 1.8em; /* Big and clear text for names */
-    font-weight: bold;
-    color: #333; /* Darker color for clarity */
-    margin: 10px 0;
+    display: flex;
+    width: 400px; 
+    justify-content: center;
+    margin: 5px 0;
+    font-size: 1.1rem;
+    font-weight:bold
 }

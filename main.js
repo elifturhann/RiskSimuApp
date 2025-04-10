@@ -371,13 +371,13 @@ function nextTurn() {
     if (riskEvent) {
         document.getElementById('riskEvent').classList.remove('hidden');
         document.getElementById('riskEventDescription').innerHTML = `
-            <p>Risk "<strong>${riskEvent.name}</strong>" has occurred!</p>
-            <p>Type: ${riskEvent.type}</p>
-            <p>Likelihood: ${riskEvent.likelihood}</p>
-            <p>Impact: ${riskEvent.impact}</p>
-            <p>Minimum Cost: €${riskEvent.minCost.toLocaleString()}</p>
-            <p>Cost as % of Budget: ${riskEvent.costPercentage}%</p>
-            <p>Risk Response: ${riskEvent.responseDescription}</p>
+            <div class="status-line"><span class="label">Risk:</span><span class="value"><strong>${riskEvent.name}</strong> has occurred!</span></div>
+    <div class="status-line"><span class="label">Type:</span><span class="value">${riskEvent.type}</span></div>
+    <div class="status-line"><span class="label">Likelihood:</span><span class="value">${riskEvent.likelihood}</span></div>
+    <div class="status-line"><span class="label">Impact:</span><span class="value">${riskEvent.impact}</span></div>
+    <div class="status-line"><span class="label">Min Cost if Occurs:</span><span class="value">€${riskEvent.minCost.toLocaleString()}</span></div>
+    <div class="status-line"><span class="label">Cost as % of Budget:</span><span class="value">${riskEvent.costPercentage}%</span></div>
+    <div class="status-line"><span class="label">Response:</span><span class="value">${riskEvent.responseDescription}</span></div>
         `;
         document.getElementById('nextTurnButton').disabled = true;
         currentRiskEvent = riskEvent;
@@ -468,11 +468,11 @@ function updateProjectStatus() {
 
     var timeRemaining = Math.max(project.duration - currentTurn, 0).toFixed(1);
     document.getElementById('projectStatus').innerHTML = `
-        <p>Turn: ${currentTurn} / ${project.originalDuration}</p>
-        <p>Budget Remaining: €${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-        <p>Risk Contingency: €${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-        <p>Time Remaining: ${timeRemaining} months</p>
-        <p>Quality: ${project.quality}%</p>
+        <div class="status-line"><span class="label">Turn:</span><span class="value">${currentTurn} / ${project.originalDuration}</span></div>
+    <div class="status-line"><span class="label">Budget Remaining:</span><span class="value">€${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
+    <div class="status-line"><span class="label">Risk Contingency Remaining:</span><span class="value">€${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
+    <div class="status-line"><span class="label">Time Remaining:</span><span class="value">${timeRemaining} months</span></div>
+    <div class="status-line"><span class="label">Quality:</span><span class="value">${project.quality}%</span></div>
     `;
 
     var realTimeScore = calculateFinalScore();
@@ -504,36 +504,59 @@ function finalizeGame(isSuccess) {
     let riskContingencyRemaining = (project.riskContingencyBudget / project.originalRiskContingencyBudget) * 100;
 
     let finalInfo = `
-        <p><strong>Final Budget:</strong> €${project.budget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${budgetRemaining.toFixed(2)}%)</p>
-        <p><strong>Final Contingency:</strong> €${project.riskContingencyBudget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${riskContingencyRemaining.toFixed(2)}%)</p>
-        <p><strong>Final Quality:</strong> ${project.quality}%</p>
-    `;
+  <div class="table-row">
+    <span class="label">Final Budget:</span>
+    <span class="value">€${project.budget.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} (${budgetRemaining.toFixed(2)}%)</span>
+  </div>
+  <div class="table-row">
+    <span class="label">Final Contingency:</span>
+    <span class="value">€${project.riskContingencyBudget.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} (${riskContingencyRemaining.toFixed(2)}%)</span>
+  </div>
+  <div class="table-row">
+    <span class="label">Final Quality:</span>
+    <span class="value">${project.quality}%</span>
+  </div>
+`;
+
 
     let message = isSuccess ?
         `<h2>Congratulations! Project Completed</h2><p>You delivered the project successfully.</p><img src="https://media0.giphy.com/media/hcnh1VGMNW3Sb8c5aX/giphy.gif" alt="Success">` :
         `<h2>Game Over: Project Failed</h2><p>${project.budget <= 0 ? "Out of budget" : "Quality too low"}</p><img src="https://media1.giphy.com/media/BGlGy3pD9THOFVzdtf/giphy.gif" class='result-img' alt="Failure">`;
 
-    let logHtml = "<h3>Performance Log</h3><ul class='performance-log'>";
-    performanceLog.forEach(entry => {
-        logHtml += `<li>Turn ${entry.turn}: Risk "${entry.risk}" - Response: ${entry.response} - Cost: €${entry.costImpact.toLocaleString()} - Quality: ${entry.quality}%</li>`;
-    });
-    logHtml += "</ul>";
+        let logHtml = "<h3>Performance Log</h3><div class='performance-log-container'><ul class='performance-log'>";
+        performanceLog.forEach(entry => {
+            logHtml += `<li>Turn ${entry.turn}: Risk "${entry.risk}" - Response: ${entry.response} - Cost: €${entry.costImpact.toLocaleString()} - Quality: ${entry.quality}%</li>`;
+        });
+        logHtml += "</ul></div>";
+        
 
     document.getElementById('finalResult').innerHTML = `
-        <h1 class="result-title">Simulation Results</h1>
-        <div class="result-names">
-            <p class="big-name">Project: ${project.name}</p>
-            <p class="big-name">Managed by: ${project.simulatorName}</p>
-        </div>
-        ${finalInfo}
-        <h3>Your Overall Score</h3>
-        <p><strong>${finalScore}%</strong> - Grade: ${grade}</p>
-        ${message}
-        ${logHtml}
-        <button class="button-action" onclick="window.print()">Print Results</button>
-        <button class="button-action" onclick="exportPerformanceLog()">Export Log</button>
-        <button class="button-action" onclick="tryAgain()">Try It Again</button>
-        <button class="button-action" onclick="exportRiskRegisterToExcel()">Export to Excel</button>
+         <h1 class="result-title">Simulation Results</h1>
+    <div class="result-names">
+        <p class="big-name">
+            <span class="label-text">Project:</span>
+            <span class="value-text">${project.name}</span>
+        </p>
+        <p class="big-name">
+            <span class="label-text">Managed by:</span>
+            <span class="value-text">${project.simulatorName}</span>
+        </p>
+    </div>
+    <div class="table-container">${finalInfo}</div>
+    <h3>Your Overall Score</h3>
+    <p><strong>${finalScore}%</strong> - Grade: ${grade}</p>
+    ${message}
+    ${logHtml}
+    <button class="button-action" onclick="window.print()">Print Results</button>
+    <button class="button-action" onclick="exportPerformanceLog()">Export Log</button>
+    <button class="button-action" onclick="tryAgain()">Try It Again</button>
+    <button class="button-action" onclick="exportRiskRegisterToExcel()">Export to Excel</button>
     `;
     document.getElementById('finalResult').classList.remove('hidden');
 }

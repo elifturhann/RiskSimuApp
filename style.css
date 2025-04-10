@@ -454,3 +454,45 @@ th {
     font-size: 1.1rem;
     font-weight:bold
 }
+@media print {
+    #header {
+      position: static;
+      box-shadow: none;
+      padding: 10px 0;
+      margin-bottom: 10px;
+      text-align: center;
+      width: 100%; 
+      margin-top: -50px; 
+    }
+  
+    #header-img {
+      max-width: 100%;
+      width: 80%; 
+      margin: 0 auto;
+      padding-bottom: 10px;
+    }
+  
+    #helpButton,
+    .btn,
+    .button-action {
+      display: none !important;
+    }
+  
+    body {
+      background: white !important;
+      animation: none !important;
+    }
+  
+    .container {
+      box-shadow: none;
+      background-color: white;
+    }
+  
+    .performance-log {
+        margin-top:20px;
+      font-size: 12px; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+    }
+  }

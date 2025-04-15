@@ -9,6 +9,8 @@ var currentRiskEvent = null;
 var performanceLog = [];
 var budgetChartInstance = null;
 var qualityChartInstance = null;
+var simulatorName = "";
+var simulatorStudent = "";
 
 window.onload = function() {
     setDefaultProjectName();
@@ -67,6 +69,9 @@ function startGame() {
     let projectDurationValue = parseInt(projectDuration.value);
     let baselineCostPerTurnValue = parseFloat(baselineCostPerTurn.value) * 1000;
     let riskContingencyPercentageValue = parseFloat(riskContingencyPercentage.value); 
+
+    simulatorName = simulatorNameInput.value.trim();
+    simulatorStudent = simulatorStudentInput.value.trim();
 
     if (projectNameValue === "") {
         Swal.fire({
@@ -148,29 +153,29 @@ function generateCheatRisks() {
         { name: "Security Breach", type: "Security", likelihood: 2, impact: 5, minCost: 6000, costPercentage: 6, responseDescription: "Perform security audits." },
         { name: "Team Turnover", type: "Operational", likelihood: 4, impact: 2, minCost: 2000, costPercentage: 2, responseDescription: "Enhance team culture." },
     
-    // Lower Impact Risks
-    { name: "Meeting Delays", type: "Management", likelihood: 3, impact: 1, minCost: 1000, costPercentage: 1, responseDescription: "Improve scheduling processes." },
-    { name: "Software Glitches", type: "Technical", likelihood: 2, impact: 2, minCost: 1500, costPercentage: 1, responseDescription: "Run frequent software updates." },
-    { name: "Mild Miscommunication", type: "Management", likelihood: 3, impact: 1, minCost: 500, costPercentage: 1, responseDescription: "Hold daily sync-up meetings." },
-    { name: "Late Documentation", type: "Operational", likelihood: 4, impact: 2, minCost: 1200, costPercentage: 1, responseDescription: "Set earlier deadlines for documentation tasks." },
-    { name: "Minor Security Flaws", type: "Security", likelihood: 2, impact: 3, minCost: 2000, costPercentage: 2, responseDescription: "Perform light security patches." },
+        // Lower Impact Risks
+        { name: "Meeting Delays", type: "Management", likelihood: 3, impact: 1, minCost: 1000, costPercentage: 1, responseDescription: "Improve scheduling processes." },
+        { name: "Software Glitches", type: "Technical", likelihood: 2, impact: 2, minCost: 1500, costPercentage: 1, responseDescription: "Run frequent software updates." },
+        { name: "Mild Miscommunication", type: "Management", likelihood: 3, impact: 1, minCost: 500, costPercentage: 1, responseDescription: "Hold daily sync-up meetings." },
+        { name: "Late Documentation", type: "Operational", likelihood: 4, impact: 2, minCost: 1200, costPercentage: 1, responseDescription: "Set earlier deadlines for documentation tasks." },
+        { name: "Minor Security Flaws", type: "Security", likelihood: 2, impact: 3, minCost: 2000, costPercentage: 2, responseDescription: "Perform light security patches." },
 
-    // Medium Impact Risks (for variety)
-    { name: "Budget Adjustment", type: "Operational", likelihood: 2, impact: 3, minCost: 3500, costPercentage: 3, responseDescription: "Reassess financial allocations." },
-    { name: "Limited Team Availability", type: "Operational", likelihood: 3, impact: 2, minCost: 2500, costPercentage: 2, responseDescription: "Optimize resource planning." },
-    { name: "Non-Critical Hardware Issue", type: "Technical", likelihood: 4, impact: 2, minCost: 2500, costPercentage: 2, responseDescription: "Increase inventory for spare hardware." },
-    { name: "Public Feedback Oversight", type: "Scope", likelihood: 2, impact: 3, minCost: 3000, costPercentage: 3, responseDescription: "Collect additional surveys." },
-    { name: "Vendor Coordination Delays", type: "Operational", likelihood: 3, impact: 2, minCost: 2000, costPercentage: 2, responseDescription: "Use better coordination tools." },
+        // Medium Impact Risks (for variety)
+        { name: "Budget Adjustment", type: "Operational", likelihood: 2, impact: 3, minCost: 3500, costPercentage: 3, responseDescription: "Reassess financial allocations." },
+        { name: "Limited Team Availability", type: "Operational", likelihood: 3, impact: 2, minCost: 2500, costPercentage: 2, responseDescription: "Optimize resource planning." },
+        { name: "Non-Critical Hardware Issue", type: "Technical", likelihood: 4, impact: 2, minCost: 2500, costPercentage: 2, responseDescription: "Increase inventory for spare hardware." },
+        { name: "Public Feedback Oversight", type: "Scope", likelihood: 2, impact: 3, minCost: 3000, costPercentage: 3, responseDescription: "Collect additional surveys." },
+        { name: "Vendor Coordination Delays", type: "Operational", likelihood: 3, impact: 2, minCost: 2000, costPercentage: 2, responseDescription: "Use better coordination tools." },
 
-    // High Impact Risks (to retain some balance)
-    { name: "Cyber Attack", type: "Security", likelihood: 2, impact: 5, minCost: 9000, costPercentage: 9, responseDescription: "Increase cybersecurity measures." },
-    { name: "Market Changes", type: "Scope", likelihood: 2, impact: 4, minCost: 4000, costPercentage: 4, responseDescription: "Adapt to market trends." },
-    { name: "Natural Disaster", type: "External", likelihood: 1, impact: 5, minCost: 10000, costPercentage: 10, responseDescription: "Create a disaster recovery plan." },
-    { name: "Contractor Unavailability", type: "Operational", likelihood: 3, impact: 3, minCost: 3500, costPercentage: 3, responseDescription: "Maintain a pool of backup contractors." },
-    { name: "Data Loss", type: "Technical", likelihood: 3, impact: 5, minCost: 7000, costPercentage: 7, responseDescription: "Implement data backups and security." }
+        // High Impact Risks (to retain some balance)
+        { name: "Cyber Attack", type: "Security", likelihood: 2, impact: 5, minCost: 9000, costPercentage: 9, responseDescription: "Increase cybersecurity measures." },
+        { name: "Market Changes", type: "Scope", likelihood: 2, impact: 4, minCost: 4000, costPercentage: 4, responseDescription: "Adapt to market trends." },
+        { name: "Natural Disaster", type: "External", likelihood: 1, impact: 5, minCost: 10000, costPercentage: 10, responseDescription: "Create a disaster recovery plan." },
+        { name: "Contractor Unavailability", type: "Operational", likelihood: 3, impact: 3, minCost: 3500, costPercentage: 3, responseDescription: "Maintain a pool of backup contractors." },
+        { name: "Data Loss", type: "Technical", likelihood: 3, impact: 5, minCost: 7000, costPercentage: 7, responseDescription: "Implement data backups and security." }
 ];    
 
-    // Shuffle the array using Fisher-Yates Shuffle
+    // Fisher-Yates Shuffle
     for (let i = cheatRisks.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
         [cheatRisks[i], cheatRisks[j]] = [cheatRisks[j], cheatRisks[i]];
@@ -372,9 +377,14 @@ function exportRiskRegisterToExcel() {
         });
         return;
     }
+    
     const ws_data = [
+        ["Name:", simulatorName || "Not Provided"],
+        ["Student ID:", simulatorStudent || "Not Provided"],
+        [], // Empty row for spacing
         ["Risk Name", "Type", "Likelihood", "Impact", "Min Cost (€)", "Cost (% of Budget)", "Risk Score", "Risk Level", "Risk Response Description"]
     ];
+    
     risks.forEach(risk => {
         ws_data.push([
             risk.name,
@@ -703,16 +713,38 @@ function getResponseExplanation(response) {
 }
 
 function exportPerformanceLog() {
-    let csvContent = "Turn,Risk,Response,Cost Impact (€),Quality (%)\n";
+    if (performanceLog.length === 0) {
+        Swal.fire({
+            icon: 'info',
+            title: 'No Data',
+            text: 'No performance data to export.',
+        });
+        return;
+    }
+    
+    const ws_data = [
+        ["Name:", simulatorName || "Not Provided"],
+        ["Student ID:", simulatorStudent || "Not Provided"],
+        [], // Empty row for spacing
+        ["Turn", "Risk", "Response", "Cost Impact (€)", "Quality (%)"]
+    ];
+    
     performanceLog.forEach(entry => {
-        csvContent += `${entry.turn},${entry.risk},${entry.response},${entry.costImpact},${entry.quality}\n`;
+        ws_data.push([
+            entry.turn,
+            entry.risk,
+            entry.response,
+            entry.costImpact,
+            entry.quality
+        ]);
     });
+
+    // Create a workbook and add the worksheet
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Performance Log");
     const timestamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `performance_log_${timestamp}.csv`;
-    link.click();
+    XLSX.writeFile(wb, `performance_log_${timestamp}.xlsx`);
 }
 
 function setupHelpModal() {

@@ -362,11 +362,10 @@ function proceedToSimulation() {
     }
     document.getElementById('game').classList.add('hidden');
     document.getElementById('simulation').classList.remove('hidden');
-    updateProjectStatus();
+    updateProjectStatus(); // This will set the initial button text
     document.getElementById('simulationInfo').innerText = `Managing Software Project: ${project.name}`;
     initializeCharts();
 }
-
 
 function exportRiskRegisterToExcel() {
     if (risks.length === 0) {
@@ -409,12 +408,30 @@ function exportRiskRegisterToExcel() {
 
 function nextTurn() {
     if (gameOver) return;
+    
+    // Only increment if this is not the overview page (currentTurn > 0)
+    if (currentTurn === 0) {
+        // First turn - just change the button text back
+        document.getElementById('nextTurnButton').innerHTML = "Next Turn";
+        currentTurn++;
+        updateProjectStatus();
+        updateCharts();
+        return;
+    }
+    
+    // Regular turn progression
     currentTurn++;
+    
     if (currentTurn > project.duration) {
         checkWinCondition();
         return;
     }
     project.budget -= project.baselineCostPerTurn;
+    
+    // Update project status immediately after incrementing turn, before checking for risk
+    updateProjectStatus();
+    updateCharts();
+    
     var riskEvent = checkForRiskEvent();
     if (riskEvent) {
         document.getElementById('riskEvent').classList.remove('hidden');
@@ -430,8 +447,6 @@ function nextTurn() {
         document.getElementById('nextTurnButton').disabled = true;
         currentRiskEvent = riskEvent;
     } else {
-        updateProjectStatus();
-        updateCharts();
         checkWinCondition();
     }
 }
@@ -530,6 +545,13 @@ function updateProjectStatus() {
     document.getElementById('scoreValue').innerText = realTimeScore + "%";
     var emoji = realTimeScore > 80 ? "🎉" : realTimeScore > 50 ? "👍" : "⚠️";
     document.getElementById('realTimeScore').innerHTML = `Current Score: <span id="scoreValue">${realTimeScore}%</span> ${emoji}`;
+
+    // Change button text from "Next Turn" to "Proceed to Simulation" if this is the first time
+    if (currentTurn === 0) {
+        document.getElementById('nextTurnButton').innerHTML = "Proceed to Simulation";
+    } else {
+        document.getElementById('nextTurnButton').innerHTML = "Next Turn";
+    }
 
     if (project.budget <= 0 || project.quality <= 0) {
         gameOver = true;

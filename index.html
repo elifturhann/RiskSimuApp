@@ -32,6 +32,8 @@
             <input type="text" id="projectName"><br>
             <label for="simulatorName">Your Name:</label> <!-- New input -->
             <input type="text" id="simulatorName" placeholder="e.g., John Doe"><br>
+            <label for="simulatorStudent">Your Student Number:</label> <!-- New input -->
+            <input type="text" id="simulatorStudent" placeholder="e.g., e0000000"><br>
             <label for="projectBudget">Project Budget (in €k):</label>
             <input type="number" id="projectBudget" value="100" onchange="updateBaselineCost()"><br>
             <label for="projectDuration">Project Duration (months):</label>
@@ -244,10 +246,10 @@
                         </li>
                         <li><strong>The score is capped at 100 and graded as follows</strong>:
                             <ul>
-                                <li>5 (Excellent): Score ≥ 90</li>
-                                <li>4 (Good): Score ≥ 75</li>
-                                <li>3 (Satisfactory): Score ≥ 55</li>
-                                <li>2 (Needs Improvement): Score ≥ 35</li>
+                                <li>5 (Excellent): Score ≥ 75</li>
+                                <li>4 (Good): Score ≥ 60</li>
+                                <li>3 (Satisfactory): Score ≥ 45</li>
+                                <li>2 (Needs Improvement): Score ≥ 30</li>
                                 <li>1 (Poor): Score ≥ 15</li>
                                 <li>0 (Fail): Score < 15</li>
                             </ul>

@@ -54,6 +54,7 @@ function updateBaselineCost() {
 function startGame() {
     let projectNameInput = document.getElementById('projectName');
     let simulatorNameInput = document.getElementById('simulatorName'); // New input
+    let simulatorStudentInput = document.getElementById('simulatorStudent'); // New input
     let projectBudget = document.getElementById('projectBudget');
     let projectDuration = document.getElementById('projectDuration');
     let baselineCostPerTurn = document.getElementById('baselineCost');
@@ -61,6 +62,7 @@ function startGame() {
 
     let projectNameValue = projectNameInput.value.trim().toLowerCase();
     let simulatorNameValue = simulatorNameInput.value.trim(); // Capture simulator name
+    let simulatorStudentValue = simulatorStudentInput.value.trim(); // Capture simulator student number
     let projectBudgetValue = parseFloat(projectBudget.value) * 1000;
     let projectDurationValue = parseInt(projectDuration.value);
     let baselineCostPerTurnValue = parseFloat(baselineCostPerTurn.value) * 1000;
@@ -69,7 +71,7 @@ function startGame() {
     if (projectNameValue === "") {
         Swal.fire({
             icon: 'error',
-            title: 'Oops...,Error',
+            title: 'Oops... Error',
             text: 'Please enter a project name.',
         });
         return;
@@ -77,11 +79,20 @@ function startGame() {
     if (simulatorNameValue === "") { // Validate simulator name
         Swal.fire({
             icon: 'error',
-            title: 'Oops...,Error',
+            title: 'Oops... Error',
             text: 'Please enter your name.',
         });
         return;
     }
+    if (simulatorStudentValue === "") { // Validate simulator student number
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops... Error',
+            text: 'Please enter your student number.',
+        });
+        return;
+    }
+    
     if (isNaN(projectBudgetValue) || projectBudgetValue <= 0) {
         Swal.fire({
             icon: 'error',
@@ -106,6 +117,7 @@ function startGame() {
     project = {
         name: projectNameValue,
         simulatorName: simulatorNameValue, // Add simulator name to project object
+        simulatorStudent: simulatorStudentValue, // Add simulator student number to project object
         budget: projectBudgetValue,
         originalBudget: projectBudgetValue,
         riskContingencyBudget: riskContingencyBudget,
@@ -129,14 +141,46 @@ function startGame() {
 function generateCheatRisks() {
     risks = [];
     var cheatRisks = [
+        // Original Risks
         { name: "Requirement Creep", type: "Scope", likelihood: 4, impact: 3, minCost: 5000, costPercentage: 5, responseDescription: "Implement agile practices." },
         { name: "Technical Debt", type: "Technical", likelihood: 3, impact: 4, minCost: 4000, costPercentage: 4, responseDescription: "Plan refactoring cycles." },
         { name: "Integration Issues", type: "Technical", likelihood: 3, impact: 3, minCost: 3000, costPercentage: 3, responseDescription: "Conduct early testing." },
         { name: "Security Breach", type: "Security", likelihood: 2, impact: 5, minCost: 6000, costPercentage: 6, responseDescription: "Perform security audits." },
-        { name: "Team Turnover", type: "Operational", likelihood: 4, impact: 2, minCost: 2000, costPercentage: 2, responseDescription: "Enhance team culture." }
-    ];
+        { name: "Team Turnover", type: "Operational", likelihood: 4, impact: 2, minCost: 2000, costPercentage: 2, responseDescription: "Enhance team culture." },
+    
+    // Lower Impact Risks
+    { name: "Meeting Delays", type: "Management", likelihood: 3, impact: 1, minCost: 1000, costPercentage: 1, responseDescription: "Improve scheduling processes." },
+    { name: "Software Glitches", type: "Technical", likelihood: 2, impact: 2, minCost: 1500, costPercentage: 1, responseDescription: "Run frequent software updates." },
+    { name: "Mild Miscommunication", type: "Management", likelihood: 3, impact: 1, minCost: 500, costPercentage: 1, responseDescription: "Hold daily sync-up meetings." },
+    { name: "Late Documentation", type: "Operational", likelihood: 4, impact: 2, minCost: 1200, costPercentage: 1, responseDescription: "Set earlier deadlines for documentation tasks." },
+    { name: "Minor Security Flaws", type: "Security", likelihood: 2, impact: 3, minCost: 2000, costPercentage: 2, responseDescription: "Perform light security patches." },
 
-    cheatRisks.forEach(function(riskData) {
+    // Medium Impact Risks (for variety)
+    { name: "Budget Adjustment", type: "Operational", likelihood: 2, impact: 3, minCost: 3500, costPercentage: 3, responseDescription: "Reassess financial allocations." },
+    { name: "Limited Team Availability", type: "Operational", likelihood: 3, impact: 2, minCost: 2500, costPercentage: 2, responseDescription: "Optimize resource planning." },
+    { name: "Non-Critical Hardware Issue", type: "Technical", likelihood: 4, impact: 2, minCost: 2500, costPercentage: 2, responseDescription: "Increase inventory for spare hardware." },
+    { name: "Public Feedback Oversight", type: "Scope", likelihood: 2, impact: 3, minCost: 3000, costPercentage: 3, responseDescription: "Collect additional surveys." },
+    { name: "Vendor Coordination Delays", type: "Operational", likelihood: 3, impact: 2, minCost: 2000, costPercentage: 2, responseDescription: "Use better coordination tools." },
+
+    // High Impact Risks (to retain some balance)
+    { name: "Cyber Attack", type: "Security", likelihood: 2, impact: 5, minCost: 9000, costPercentage: 9, responseDescription: "Increase cybersecurity measures." },
+    { name: "Market Changes", type: "Scope", likelihood: 2, impact: 4, minCost: 4000, costPercentage: 4, responseDescription: "Adapt to market trends." },
+    { name: "Natural Disaster", type: "External", likelihood: 1, impact: 5, minCost: 10000, costPercentage: 10, responseDescription: "Create a disaster recovery plan." },
+    { name: "Contractor Unavailability", type: "Operational", likelihood: 3, impact: 3, minCost: 3500, costPercentage: 3, responseDescription: "Maintain a pool of backup contractors." },
+    { name: "Data Loss", type: "Technical", likelihood: 3, impact: 5, minCost: 7000, costPercentage: 7, responseDescription: "Implement data backups and security." }
+];    
+
+    // Shuffle the array using Fisher-Yates Shuffle
+    for (let i = cheatRisks.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [cheatRisks[i], cheatRisks[j]] = [cheatRisks[j], cheatRisks[i]];
+    }
+
+    // Select the first 5 risks after shuffling
+    let randomCheatRisks = cheatRisks.slice(0, 5);
+
+    // Add the randomly selected risks to the risks array
+    randomCheatRisks.forEach(function(riskData) {
         var riskScore = riskData.likelihood * riskData.impact;
         var riskLevel = getRiskLevel(riskScore);
         risks.push({
@@ -154,15 +198,8 @@ function generateCheatRisks() {
     });
 }
 
+
 function addRisk() {
-    if (risks.length >= 5) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Limit Reached',
-            text: 'Maximum of 5 risks reached!',
-        });
-        return;
-    }
 
     var riskName = document.getElementById('riskName').value;
     var riskType = document.getElementById('riskType').value;
@@ -249,6 +286,7 @@ function addRisk() {
     }
 }
 
+
 function removeRisk(index) {
     risks.splice(index, 1);
     updateRiskTable();
@@ -309,11 +347,11 @@ function getRiskLevelClass(level) {
 }
 
 function proceedToSimulation() {
-    if (risks.length !== 5) {
+    if (risks.length < 5) {
         Swal.fire({
             icon: 'warning',
             title: 'Incomplete Risks',
-            text: 'Please add exactly 5 risks before proceeding.',
+            text: 'Please add at least 5 risks before proceeding.',
         });
         return;
     }
@@ -455,6 +493,9 @@ function respondToRisk() {
     updateProjectStatus();
     updateCharts();
     checkWinCondition();
+
+    // Reset the dropdown to default
+    document.getElementById('riskResponse').value = "";
 }
 
 function updateProjectStatus() {
@@ -547,6 +588,10 @@ function finalizeGame(isSuccess) {
             <span class="label-text" style="margin-right: 5px;">Managed by: </span>
             <span class="value-text">${project.simulatorName}</span>
         </p>
+        <p class="big-name">
+            <span class="label-text" style="margin-right: 5px;">Student Number: </span>
+            <span class="value-text">${project.simulatorStudent}</span>
+        </p>
     </div>
 
     <div class="table-container">${finalInfo}</div>
@@ -571,10 +616,10 @@ function calculateFinalScore() {
 }
 
 function getGrade(score) {
-    if (score >= 90) return "5 (Excellent)";
-    else if (score >= 75) return "4 (Good)";
-    else if (score >= 55) return "3 (Satisfactory)";
-    else if (score >= 35) return "2 (Needs Improvement)";
+    if (score >= 75) return "5 (Excellent)";
+    else if (score >= 60) return "4 (Good)";
+    else if (score >= 45) return "3 (Satisfactory)";
+    else if (score >= 30) return "2 (Needs Improvement)";
     else if (score >= 15) return "1 (Poor)";
     else return "0 (Fail)";
 }
@@ -715,6 +760,7 @@ function tryAgain() {
     document.getElementById('gameBackButton').disabled = true;
     document.getElementById('projectName').value = "";
     document.getElementById('simulatorName').value = ""; // Reset new input
+    document.getElementById('simulatorStudent').value = ""; // Reset new input
     document.getElementById('projectBudget').value = "100";
     document.getElementById('projectDuration').value = "24";
     document.getElementById('riskContingencyPercentage').value = "10";

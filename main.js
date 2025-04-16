@@ -452,18 +452,34 @@ function nextTurn() {
 }
 
 function checkForRiskEvent() {
-    var shuffledRisks = risks.slice().sort(() => 0.5 - Math.random());
-    for (var i = 0; i < shuffledRisks.length; i++) {
-        var risk = shuffledRisks[i];
-        if (!risk.occurred) {
-            var probability = risk.likelihood / 5;
-            if (Math.random() < probability) {
-                risk.occurred = true;
-                return risk;
-            }
-        }
+    // Get all risks that haven't occurred yet
+    var pendingRisks = risks.filter(risk => !risk.occurred);
+    
+    // If there are no pending risks, return null
+    if (pendingRisks.length === 0) return null;
+    
+    // Randomly select ONE risk to evaluate this turn
+    var selectedRiskIndex = Math.floor(Math.random() * pendingRisks.length);
+    var risk = pendingRisks[selectedRiskIndex];
+    
+    // Define specific probabilities based on likelihood
+    var probability;
+    switch(risk.likelihood) {
+        case 5: probability = 0.90; break; // 90% chance
+        case 4: probability = 0.70; break; // 70% chance
+        case 3: probability = 0.50; break; // 50% chance
+        case 2: probability = 0.30; break; // 30% chance
+        case 1: probability = 0.10; break; // 10% chance
+        default: probability = 0.10; // Fallback to 10% if likelihood is invalid
     }
-    return null;
+    
+    // Check if the risk occurs
+    if (Math.random() < probability) {
+        risk.occurred = true;
+        return risk;
+    }
+    
+    return null; // No risk occurred this turn
 }
 
 function respondToRisk() {

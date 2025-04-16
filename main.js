@@ -524,8 +524,10 @@ function respondToRisk() {
         risk: currentRiskEvent.name,
         response: response,
         costImpact: costImpact,
-        quality: project.quality
+        quality: project.quality,
+        timeImpact: timeImpact
     });
+    
 
     document.getElementById('riskEvent').classList.add('hidden');
     document.getElementById('nextTurnButton').disabled = false;
@@ -616,11 +618,43 @@ function finalizeGame(isSuccess) {
         `<h2>Congratulations! Project Completed</h2><p>You delivered the project successfully.</p><img src="https://media0.giphy.com/media/hcnh1VGMNW3Sb8c5aX/giphy.gif" alt="Success">` :
         `<h2>Game Over: Project Failed</h2><p>${project.budget <= 0 ? "Out of budget" : "Quality too low"}</p><img src="https://media1.giphy.com/media/BGlGy3pD9THOFVzdtf/giphy.gif" class='result-img' alt="Failure">`;
 
-        let logHtml = "<h3>Performance Log</h3><div class='performance-log-container'><ul class='performance-log'>";
-        performanceLog.forEach(entry => {
-            logHtml += `<li>Turn ${entry.turn}: Risk "${entry.risk}" - Response: ${entry.response} - Cost: €${entry.costImpact.toLocaleString()} - Quality: ${entry.quality}%</li>`;
-        });
-        logHtml += "</ul></div>";
+    let logHtml = `
+<h3 style="text-align:center;">Performance Log</h3>
+<div class="performance-log-container">
+    <table class="performance-log-table">
+        <thead>
+            <tr>
+                <th>Turn</th>
+                <th>Risk</th>
+                <th>Response</th>
+                <th>Cost</th>
+                <th>Quality</th>
+                <th>Time Impact</th>
+            </tr>
+        </thead>
+        <tbody>
+`;
+
+performanceLog.forEach(entry => {
+    logHtml += `
+        <tr>
+            <td>${entry.turn}</td>
+            <td>${entry.risk}</td>
+            <td>${entry.response}</td>
+            <td>€${entry.costImpact.toLocaleString()}</td>
+            <td>${entry.quality}%</td>
+            <td>${entry.timeImpact.toFixed(2)} days</td>
+        </tr>
+    `;
+});
+
+logHtml += `
+        </tbody>
+    </table>
+</div>
+`;
+
+    
         
 
     document.getElementById('finalResult').innerHTML = `

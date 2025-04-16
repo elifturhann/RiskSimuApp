@@ -521,22 +521,35 @@ ol.custom-list {
 }
 .performance-log-container {
     display: flex;
-    justify-content: center;  
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 40px; /* Space after the table */
+}
+
+.performance-log-table {
+    border-collapse: collapse;
+    width: 90%;
+    max-width: 800px;
+    color: #333; /* Main text color */
+    font-family: Arial, sans-serif;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    background-color: #ffffff; 
+    border: 1px solid #ccc;
+}
+
+.performance-log-table th {
+    background-color: #3498db; 
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    text-align: center;
+}
+
+.performance-log-table td {
+    border: 1px solid #ccc;
     padding: 10px;
-    width: 100%;
-  }
-  .performance-log {
-    list-style-type: none;     
-    padding-left: 50;           
-    text-align: left;         
-    max-width: 600px;         
-    width: 100%;
-    color: darkgoldenrod;
-  }
-  
-  .performance-log li {
-    margin-bottom: 8px;       
-  }
+    text-align: center;
+}
 
 
 #finalResult {

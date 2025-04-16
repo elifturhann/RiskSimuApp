@@ -454,11 +454,9 @@ function nextTurn() {
 function checkForRiskEvent() {
     // Get all risks that haven't occurred yet
     var pendingRisks = risks.filter(risk => !risk.occurred);
-    
-    // If there are no pending risks, return null
+
     if (pendingRisks.length === 0) return null;
     
-    // Randomly select ONE risk to evaluate this turn
     var selectedRiskIndex = Math.floor(Math.random() * pendingRisks.length);
     var risk = pendingRisks[selectedRiskIndex];
     

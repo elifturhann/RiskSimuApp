@@ -159,6 +159,16 @@ th {
     border-radius: 5px;
 }
 
+.edit-button {
+    padding: 5px 10px;
+    background: #008CBA;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+
 #result {
     margin-top: 20px;
 }
@@ -300,16 +310,15 @@ th {
     padding: 10px;
     width: 100%;
     max-width: 400px;         
-  }
-  
-  .table-row {
+}
+
+.table-row {
     display: flex;
     width: 100%;              
     max-width: 500px;          
     margin-bottom: 8px;
     justify-content: center;
-  }
-  
+}
 
 .table-cell {
     display: table-cell;
@@ -398,7 +407,6 @@ th {
     text-decoration: none;
 }
 
-/* Added Instructions CSS */
 .header-container {
     background: linear-gradient(135deg, #3498db, #9b59b6, #e91e63);
     color: white;
@@ -496,18 +504,15 @@ ul li, ol li {
     margin-bottom: 8px;
 }
 
-/* Remove default list numbers */
 ol.custom-list {
     list-style-type: none;
     padding-left: 0;
 }
 
-/* Purple table styles */
 .purple-table th {
     background-color: #9b59b6;
 }
 
-/* Pink table styles */
 .pink-table th {
     background-color: #e91e63;
 }
@@ -519,18 +524,19 @@ ol.custom-list {
     padding: 10px;
     width: 100%;
 }
+
 .performance-log-container {
     display: flex;
     justify-content: center;
     margin-top: 20px;
-    margin-bottom: 40px; /* Space after the table */
+    margin-bottom: 40px;
 }
 
 .performance-log-table {
     border-collapse: collapse;
     width: 90%;
     max-width: 800px;
-    color: #333; /* Main text color */
+    color: #333;
     font-family: Arial, sans-serif;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     background-color: #ffffff; 
@@ -551,87 +557,112 @@ ol.custom-list {
     text-align: center;
 }
 
-
-#finalResult {
-    text-align: center;
+.performance-log-table tr:nth-child(even) {
+    background-color: #f9f9f9;
 }
 
-#finalResult img {
-    max-width: 20%;
-    height: auto;
-    margin-top: 20px;
-    margin-left: 0;
-    display: inline-block;
+.performance-log-table tr:hover {
+    background-color: #f1f1f1;
 }
 
 .result-title {
-    font-size: 2em; 
     margin-bottom: 20px;
+    color: #2c3e50;
 }
 
 .result-names {
-    display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 1rem;
+    margin-bottom: 20px;
 }
 
 .big-name {
+    font-size: 1.2em;
+    margin: 10px 0;
     display: flex;
-    width: 400px; 
     justify-content: center;
-    margin: 5px 0;
-    font-size: 1.1rem;
-    font-weight:bold
+    align-items: center;
 }
+
+.label-text {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.value-text {
+    color: #2980b9;
+}
+
 @media print {
-    #header {
-      position: static;
-      box-shadow: none;
-      padding: 10px 0;
-      margin-bottom: 10px;
-      text-align: center;
-      width: 100%; 
-      margin-top: -50px; 
+    #helpButton, .modal, .button-action:not(:last-child), #gameBackButton {
+        display: none !important;
     }
-  
-    #header-img {
-      max-width: 100%;
-      width: 80%; 
-      margin: 0 auto;
-      padding-bottom: 10px;
+    #finalResult {
+        text-align: center;
     }
-  
-    #helpButton,
-    .btn,
-    .button-action {
-      display: none !important;
-    }
-  
-    body {
-      background: white !important;
-      animation: none !important;
-    }
-  
     .container {
-      box-shadow: none;
-      background-color: white;
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
     }
-  
-    .performance-log {
-        margin-top:20px;
-      font-size: 12px; 
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        width: 90%;
+        padding: 20px;
     }
-
-    .label-text {
-        margin-right: 5px;  /* Adjust as necessary */
+    .form-row {
+        flex-direction: column;
+        align-items: flex-start;
     }
-  
-    
+    .form-row label,
+    .form-row input,
+    .form-row select {
+        width: 100%;
+        text-align: left;
+    }
+    .form-row label {
+        margin-bottom: 5px;
+    }
+    .progress-bar {
+        width: 100%;
+    }
+    #charts canvas {
+        width: 100% !important;
+        max-width: 300px;
+    }
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    .performance-log-table {
+        width: 100%;
+        font-size: 0.9em;
+    }
+    #header-img {
+        width: 80%;
+    }
+}
 
-
-    
-  }
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 15px;
+    }
+    h1, h2, h3 {
+        font-size: 1.2em;
+    }
+    .button-action {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+    table th, table td {
+        font-size: 0.8em;
+        padding: 5px;
+    }
+    .progress-label {
+        width: 100px;
+        font-size: 0.9em;
+    }
+    #finalResult img {
+        max-width: 50%;
+    }
+}

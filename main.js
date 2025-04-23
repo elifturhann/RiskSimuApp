@@ -425,18 +425,16 @@ function nextTurn() {
     if (currentTurn === 0) {
         document.getElementById('nextTurnButton').innerHTML = "Next Turn";
         currentTurn++;
-        updateProjectStatus();
-        updateCharts();
-        return;
+    } else {
+        currentTurn++;
+        
+        if (currentTurn > project.duration) {
+            checkWinCondition();
+            return;
+        }
+        
+        project.budget -= project.baselineCostPerTurn;
     }
-    
-    currentTurn++;
-    
-    if (currentTurn > project.duration) {
-        checkWinCondition();
-        return;
-    }
-    project.budget -= project.baselineCostPerTurn;
     
     updateProjectStatus();
     updateCharts();
